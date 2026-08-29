@@ -8,7 +8,10 @@
 
 .blog .site-main article,
 .archive .site-main article {
-  background: var(--nl-bg);
+  /* var(--base-3) es la superficie de tarjeta del padre; seguirla en vez de
+     imponer la nuestra respeta lo que el usuario haya puesto en el
+     Customizer, y en oscuro ya viene remapeada desde tokens.css. */
+  background: var(--base-3, var(--nl-bg));
   border: 1px solid var(--nl-border);
   border-radius: var(--nl-radius-lg);
   overflow: hidden;

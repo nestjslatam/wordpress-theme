@@ -111,5 +111,26 @@
     --nl-shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
     --nl-shadow:    0 4px 16px rgba(0, 0, 0, .5);
     --nl-shadow-lg: 0 12px 40px rgba(0, 0, 0, .6);
+
+    /* GeneratePress se pinta ENTERO con estas siete variables, que salen del
+       Customizer y llegan como CSS en línea. Sin remapearlas aquí, el padre
+       sigue pintando las tarjetas de blanco mientras nosotros aclaramos el
+       texto: texto claro sobre tarjeta blanca, ilegible.
+       Remapeándolas, la cabecera, la barra lateral, el pie y el buscador van
+       en oscuro de forma coherente sin perseguir un selector detrás de otro.
+
+       La especificidad de `:root:not(...)` gana a la de `:root` del padre,
+       así que el orden de carga no decide el resultado. */
+    --contrast:   var(--nl-text);
+    --contrast-2: var(--nl-text-muted);
+    --contrast-3: var(--nl-text-faint);
+    --base:       var(--nl-bg-sunken);
+    --base-2:     var(--nl-bg);        /* fondo de página */
+    --base-3:     var(--nl-bg-subtle); /* tarjetas: un punto por encima */
+    --accent:     var(--nl-blue);
+
+    --gp-search-modal-bg-color:         var(--nl-bg-subtle);
+    --gp-search-modal-text-color:       var(--nl-text);
+    --gp-search-modal-overlay-bg-color: rgba(0, 0, 0, .6);
   }
 }
