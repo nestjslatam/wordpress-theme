@@ -1,19 +1,14 @@
 /**
  * La pantalla de acceso, con la identidad del sitio.
  *
- * El sitio tiene LoginPress instalado, que también estiliza esta pantalla y
- * publica sus reglas como CSS EN LÍNEA — es decir, después de esta hoja. A
- * igualdad de especificidad gana el suyo, así que aquí se encadena por
- * `html body.login` (0,1,2) para superar su `body.login` y su `.login form`.
+ * El encadenado por `html body.login` viene de cuando el sitio tenía LoginPress,
+ * que publicaba sus reglas como CSS en línea —después de esta hoja— y ganaba a
+ * igualdad de especificidad. El plugin ya no está, pero la especificidad de más
+ * no molesta y protege de que otro plugin vuelva a hacer lo mismo.
  *
- * Hay 24 usos de !important, y no son elegantes: LoginPress declara buena
- * parte de sus colores y medidas con !important, y contra eso la especificidad
- * no basta. Se limitan a las propiedades donde el plugin lo usa a su vez.
- *
- * Si algún día se desactiva LoginPress —que es lo que recomendaría, porque dos
- * cosas estilizando la misma pantalla es de donde vienen los desajustes— esta
- * hoja sigue funcionando y estos !important se pueden ir quitando de uno en
- * uno comprobando que nada se rompe.
+ * Quedan 16 usos de, y todos responden al CSS del núcleo de
+ * WordPress, que declara así el botón principal y los enlaces del pie. Los que
+ * hacían falta contra LoginPress se retiraron cuando el plugin se desactivó.
  */
 
 /* Fondo y tipografía ------------------------------------------------------ */
@@ -56,12 +51,12 @@ html body.login #login { position: relative; z-index: 1; padding-top: 6vh; }
 
 html body.login h1 a,
 html body.login .login h1 a {
-  background-image: url('../img/logo-96.png') !important;   /* el plugin fija el suyo */
-  background-size: 84px 84px !important;
+  background-image: url('../img/logo-96.png');
+  background-size: 84px 84px;
   background-position: center;
   background-repeat: no-repeat;
-  width: 84px !important;
-  height: 84px !important;
+  width: 84px;
+  height: 84px;
   margin: 0 auto var(--nl-space-6);
   text-indent: -9999px;
   overflow: hidden;
@@ -72,7 +67,7 @@ html body.login .login h1 a {
 
 html body.login form {
   background: var(--nl-bg-subtle);
-  background-image: none;      /* LoginPress ponía el logo aquí, a tamaño «cover» */
+  background-image: none;   /* el núcleo pone «initial»; se deja explícito */
   border: 1px solid var(--nl-border-soft);
   border-radius: var(--nl-radius-lg);
   box-shadow: var(--nl-shadow);
@@ -122,18 +117,18 @@ html body.login .wp-hide-pw:hover { color: var(--nl-text); }
 /* Botón principal: blanco con texto negro, la firma del portal. */
 html body.login .button-primary,
 html body.login #wp-submit {
-  background: var(--nl-text) !important;      /* el plugin lo pinta con !important */
-  border: 0 !important;
-  color: var(--nl-text-invert) !important;
-  border-radius: var(--nl-radius-btn) !important;
+  background: var(--nl-text);      /* el plugin lo pinta con */
+  border: 0;
+  color: var(--nl-text-invert);
+  border-radius: var(--nl-radius-btn);
   font-family: var(--nl-font);
   font-weight: var(--nl-weight-strong);
   font-size: var(--nl-text-sm);
-  text-shadow: none !important;
-  box-shadow: none !important;
-  padding: 0.7em 1.6em !important;
-  height: auto !important;
-  line-height: 1.4 !important;
+  text-shadow: none;
+  box-shadow: none;
+  padding: 0.7em 1.6em;
+  height: auto;
+  line-height: 1.4;
   width: 100%;
   transition: opacity var(--nl-transition), transform var(--nl-transition);
 }
@@ -145,13 +140,13 @@ html body.login .button-primary:hover { opacity: .9; transform: translateY(-1px)
    integran en la paleta en vez de dejarlos flotando en blanco. */
 html body.login .nsl-container,
 html body.login .googlesitekit-sign-in-with-google__frontend-output-button {
-  margin-bottom: var(--nl-space-4) !important;
+  margin-bottom: var(--nl-space-4);
   border-radius: var(--nl-radius-btn);
   overflow: hidden;
 }
 html body.login .nsl-container-buttons a {
-  border-radius: var(--nl-radius-btn) !important;
-  border: 1px solid var(--nl-border) !important;
+  border-radius: var(--nl-radius-btn);
+  border: 1px solid var(--nl-border);
 }
 
 /* Enlaces del pie de la pantalla ------------------------------------------ */
@@ -163,13 +158,13 @@ html body.login .privacy-policy-page-link { text-align: center; }
 html body.login #nav a,
 html body.login #backtoblog a,
 html body.login .privacy-policy-link {
-  color: var(--nl-text-muted) !important;
+  color: var(--nl-text-muted);
   font-size: var(--nl-text-sm);
   text-decoration: none;
   transition: color var(--nl-transition);
 }
 html body.login #nav a:hover,
-html body.login #backtoblog a:hover { color: var(--nl-red-soft) !important; }
+html body.login #backtoblog a:hover { color: var(--nl-red-soft); }
 
 /* Avisos ------------------------------------------------------------------ */
 
@@ -195,11 +190,11 @@ html body.login .language-switcher select {
   color: var(--nl-text);
 }
 html body.login .language-switcher .button {
-  background: transparent !important;
-  border: 1px solid var(--nl-border) !important;
-  color: var(--nl-text-muted) !important;
-  border-radius: var(--nl-radius) !important;
-  text-shadow: none !important;
+  background: transparent;
+  border: 1px solid var(--nl-border);
+  color: var(--nl-text-muted);
+  border-radius: var(--nl-radius);
+  text-shadow: none;
 }
 
 /* Vuelta al portal, con más presencia: es el enlace que más se usa. */
@@ -219,5 +214,5 @@ html body.login #backtoblog a:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html body.login * { transition-duration: .01ms !important; }
+  html body.login * { transition-duration: .01ms; }
 }
