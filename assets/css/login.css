@@ -1,129 +1,223 @@
-/* La pantalla de wp-login.php, con la identidad del sitio. */
+/**
+ * La pantalla de acceso, con la identidad del sitio.
+ *
+ * El sitio tiene LoginPress instalado, que también estiliza esta pantalla y
+ * publica sus reglas como CSS EN LÍNEA — es decir, después de esta hoja. A
+ * igualdad de especificidad gana el suyo, así que aquí se encadena por
+ * `html body.login` (0,1,2) para superar su `body.login` y su `.login form`.
+ *
+ * Hay 24 usos de !important, y no son elegantes: LoginPress declara buena
+ * parte de sus colores y medidas con !important, y contra eso la especificidad
+ * no basta. Se limitan a las propiedades donde el plugin lo usa a su vez.
+ *
+ * Si algún día se desactiva LoginPress —que es lo que recomendaría, porque dos
+ * cosas estilizando la misma pantalla es de donde vienen los desajustes— esta
+ * hoja sigue funcionando y estos !important se pueden ir quitando de uno en
+ * uno comprobando que nada se rompe.
+ */
 
-body.login {
+/* Fondo y tipografía ------------------------------------------------------ */
+
+html body.login {
   background: var(--nl-bg);
   color: var(--nl-text);
   font-family: var(--nl-font);
 }
 
-/* El logo: la marca del sitio en lugar del de WordPress. */
-body.login h1 a {
-  background-image: url('../img/logo-96.png');
-  background-size: 76px 76px;
-  width: 76px;
-  height: 76px;
-  margin-bottom: var(--nl-space-6);
+/* El degradado de la marca, el mismo filete que corona el portal. */
+html body.login::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    var(--nl-red) 0%, var(--nl-red-soft) 38%, var(--nl-gold) 70%, var(--nl-red) 100%);
+  z-index: 10;
 }
 
-.login form {
+/* Un resplandor rojo detrás del formulario, como en el héroe de la portada. */
+html body.login::after {
+  content: '';
+  position: fixed;
+  top: -18%;
+  left: 50%;
+  translate: -50% 0;
+  width: min(760px, 130%);
+  aspect-ratio: 1;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--nl-red) 17%, transparent) 0%, transparent 62%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+html body.login #login { position: relative; z-index: 1; padding-top: 6vh; }
+
+/* La marca ---------------------------------------------------------------- */
+
+html body.login h1 a,
+html body.login .login h1 a {
+  background-image: url('../img/logo-96.png') !important;   /* el plugin fija el suyo */
+  background-size: 84px 84px !important;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 84px !important;
+  height: 84px !important;
+  margin: 0 auto var(--nl-space-6);
+  text-indent: -9999px;
+  overflow: hidden;
+  filter: drop-shadow(0 3px 18px color-mix(in srgb, var(--nl-red) 45%, transparent));
+}
+
+/* El formulario ----------------------------------------------------------- */
+
+html body.login form {
   background: var(--nl-bg-subtle);
+  background-image: none;      /* LoginPress ponía el logo aquí, a tamaño «cover» */
   border: 1px solid var(--nl-border-soft);
   border-radius: var(--nl-radius-lg);
-  box-shadow: none;
+  box-shadow: var(--nl-shadow);
   padding: var(--nl-space-8);
+  margin-top: 0;
+  backdrop-filter: blur(8px);
 }
 
-.login label { color: var(--nl-text-muted); font-size: var(--nl-text-sm); }
+html body.login form label,
+html body.login label {
+  color: var(--nl-text-muted);
+  font-size: var(--nl-text-sm);
+  font-weight: 500;
+}
 
-.login input[type='text'],
-.login input[type='password'],
-.login input[type='email'] {
+html body.login input[type='text'],
+html body.login input[type='password'],
+html body.login input[type='email'],
+html body.login .login form .input {
   background: var(--nl-bg-solid);
   border: 1px solid var(--nl-border);
   border-radius: var(--nl-radius);
   color: var(--nl-text);
-  padding: 0.6em 0.8em;
+  font-family: var(--nl-font);
+  font-size: var(--nl-text-base);
+  padding: 0.7em 0.9em;
   box-shadow: none;
+  transition: border-color var(--nl-transition), box-shadow var(--nl-transition);
 }
-.login input[type='text']:focus,
-.login input[type='password']:focus,
-.login input[type='email']:focus {
+html body.login input[type='text']:focus,
+html body.login input[type='password']:focus,
+html body.login input[type='email']:focus {
   border-color: var(--nl-red);
-  box-shadow: 0 0 0 1px var(--nl-red);
-  outline: 2px solid transparent;   /* el anillo lo pinta el box-shadow */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--nl-red) 22%, transparent);
+  outline: 2px solid transparent;    /* el anillo lo pinta el box-shadow */
 }
 
-.login .button-primary {
-  background: var(--nl-text) !important;   /* gana al CSS del núcleo */
-  border-color: var(--nl-text) !important;
+/* El ojo que muestra la contraseña, sobre fondo oscuro. */
+html body.login .wp-hide-pw,
+html body.login button.wp-hide-pw {
+  background: transparent;
+  border: 0;
+  color: var(--nl-text-faint);
+}
+html body.login .wp-hide-pw:hover { color: var(--nl-text); }
+
+/* Botón principal: blanco con texto negro, la firma del portal. */
+html body.login .button-primary,
+html body.login #wp-submit {
+  background: var(--nl-text) !important;      /* el plugin lo pinta con !important */
+  border: 0 !important;
   color: var(--nl-text-invert) !important;
   border-radius: var(--nl-radius-btn) !important;
+  font-family: var(--nl-font);
+  font-weight: var(--nl-weight-strong);
+  font-size: var(--nl-text-sm);
   text-shadow: none !important;
   box-shadow: none !important;
-  font-weight: var(--nl-weight-strong);
-  padding: 0.4em 1.4em !important;
+  padding: 0.7em 1.6em !important;
   height: auto !important;
-  line-height: 1.9 !important;
+  line-height: 1.4 !important;
+  width: 100%;
+  transition: opacity var(--nl-transition), transform var(--nl-transition);
 }
-.login .button-primary:hover { opacity: .9; }
+html body.login .button-primary:hover { opacity: .9; transform: translateY(-1px); }
 
-.login #nav a,
-.login #backtoblog a,
-.login .privacy-policy-link {
+/* Acceso con proveedores externos ---------------------------------------- */
+
+/* Los botones de Google y de Nextend llegan con su propio aspecto claro. Se
+   integran en la paleta en vez de dejarlos flotando en blanco. */
+html body.login .nsl-container,
+html body.login .googlesitekit-sign-in-with-google__frontend-output-button {
+  margin-bottom: var(--nl-space-4) !important;
+  border-radius: var(--nl-radius-btn);
+  overflow: hidden;
+}
+html body.login .nsl-container-buttons a {
+  border-radius: var(--nl-radius-btn) !important;
+  border: 1px solid var(--nl-border) !important;
+}
+
+/* Enlaces del pie de la pantalla ------------------------------------------ */
+
+html body.login #nav,
+html body.login #backtoblog,
+html body.login .privacy-policy-page-link { text-align: center; }
+
+html body.login #nav a,
+html body.login #backtoblog a,
+html body.login .privacy-policy-link {
   color: var(--nl-text-muted) !important;
-  font-size: var(--nl-text-xs);
+  font-size: var(--nl-text-sm);
+  text-decoration: none;
+  transition: color var(--nl-transition);
 }
-.login #nav a:hover,
-.login #backtoblog a:hover { color: var(--nl-red-soft) !important; }
+html body.login #nav a:hover,
+html body.login #backtoblog a:hover { color: var(--nl-red-soft) !important; }
 
-.login .message,
-.login #login_error {
+/* Avisos ------------------------------------------------------------------ */
+
+html body.login .message,
+html body.login .success,
+html body.login #login_error {
   background: var(--nl-bg-subtle);
+  border: 1px solid var(--nl-border-soft);
   border-left: 3px solid var(--nl-red);
   border-radius: var(--nl-radius);
   color: var(--nl-text-muted);
   box-shadow: none;
+  font-size: var(--nl-text-sm);
 }
-.login .message { border-left-color: var(--nl-ok); }
+html body.login .message,
+html body.login .success { border-left-color: var(--nl-ok); }
 
-/* El atajo [nl_acceso], dentro de una página normal ----------------------- */
-
-.nl-auth {
-  display: grid;
-  gap: var(--nl-space-6);
-  margin: var(--nl-space-12) 0;
-}
-@media (min-width: 780px) { .nl-auth { grid-template-columns: 1fr 1fr; } }
-.nl-auth--in { display: block; max-width: 30rem; }
-
-.nl-auth__panel {
-  padding: var(--nl-space-8);
-  border: 1px solid var(--nl-border-soft);
-  border-radius: var(--nl-radius-lg);
+/* El selector de idioma del pie. */
+html body.login .language-switcher select {
   background: var(--nl-bg-subtle);
-}
-.nl-auth__title {
-  font-size: var(--nl-text-xl);
-  font-weight: 600;
-  margin: 0 0 var(--nl-space-4);
-  border: 0;
-  padding: 0;
-}
-.nl-auth__note  { color: var(--nl-text-muted); font-size: var(--nl-text-sm); }
-.nl-auth__hi    { font-size: var(--nl-text-lg); margin-bottom: var(--nl-space-2); }
-.nl-auth__aside { font-size: var(--nl-text-xs); margin: var(--nl-space-4) 0 0; }
-.nl-auth__aside a { color: var(--nl-text-muted); text-decoration: none; }
-.nl-auth__aside a:hover { color: var(--nl-red-soft); }
-
-.nl-auth .login-username,
-.nl-auth .login-password { margin-bottom: var(--nl-space-4); }
-.nl-auth label { display: block; font-size: var(--nl-text-sm); color: var(--nl-text-muted); margin-bottom: var(--nl-space-2); }
-.nl-auth input[type='text'],
-.nl-auth input[type='password'] {
-  width: 100%;
-  background: var(--nl-bg-solid);
   border: 1px solid var(--nl-border);
   border-radius: var(--nl-radius);
   color: var(--nl-text);
-  padding: 0.7em 1em;
 }
-.nl-auth .login-remember label { display: flex; align-items: center; gap: var(--nl-space-2); }
-.nl-auth .login-submit input {
-  background: var(--nl-text);
-  color: var(--nl-text-invert);
-  border: 0;
-  border-radius: var(--nl-radius-btn);
-  font-weight: var(--nl-weight-strong);
-  padding: 0.8em 1.7em;
-  cursor: pointer;
+html body.login .language-switcher .button {
+  background: transparent !important;
+  border: 1px solid var(--nl-border) !important;
+  color: var(--nl-text-muted) !important;
+  border-radius: var(--nl-radius) !important;
+  text-shadow: none !important;
+}
+
+/* Vuelta al portal, con más presencia: es el enlace que más se usa. */
+html body.login #backtoblog {
+  margin-top: var(--nl-space-6);
+}
+html body.login #backtoblog a {
+  display: inline-block;
+  padding: 0.5em 1.2em;
+  border: 1px solid var(--nl-border-soft);
+  border-radius: var(--nl-radius-full);
+  background: var(--nl-bg-subtle);
+}
+html body.login #backtoblog a:hover {
+  border-color: var(--nl-border);
+  background: var(--nl-bg-sunken);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body.login * { transition-duration: .01ms !important; }
 }
