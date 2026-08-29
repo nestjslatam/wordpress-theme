@@ -47,3 +47,17 @@ jobs:
 
       - name: Los dos menús llevan los mismos destinos
         run: python3 scripts/comparar-menus.py
+
+      - name: Cada plantilla referenciada existe
+        run: |
+          # El atajo [nl_pagina nombre="x"] falla en silencio si plantillas/x.php
+          # no está: la página sale vacía y nada lo delata.
+          python3 - <<'PY'
+          import re, pathlib, sys
+          gen = pathlib.Path('contenido/generar-wxr.py').read_text()
+          nombres = {f[:-5] for f in re.findall(r"'([a-z-]+\.html)'", gen)}
+          falta = [n for n in nombres if not pathlib.Path(f'plantillas/{n}.php').exists()]
+          if falta:
+              print('  plantillas que faltan:', ', '.join(sorted(falta))); sys.exit(1)
+          print(f'  ✓ las {len(nombres)} plantillas existen')
+          PY

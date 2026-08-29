@@ -188,7 +188,11 @@ def item(titulo, slug, cuerpo, tipo, orden, cats=(), tags=(), metas=()):
 
 
 for titulo, slug, fichero, orden in PAGINAS:
-    cuerpo = leer(fichero) if fichero else ''
+    # El marcado vive en el tema, en plantillas/. Aquí sólo va el atajo: el
+    # importador de WordPress escapa las comillas del HTML de los bloques
+    # wp:html, y las clases dejaban de existir.
+    plantilla = fichero[:-5] if fichero else None   # quita el .html
+    cuerpo = f'[nl_pagina nombre="{plantilla}"]' if plantilla else ''
     partes.append(item(titulo, slug, cuerpo, 'page', orden))
 
 for titulo, fichero in ARTICULOS:

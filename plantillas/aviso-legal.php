@@ -1,0 +1,54 @@
+<?php
+/**
+ * Contenido de la página. Vive en el tema y no en la base de datos:
+ * el importador de WordPress escapa las comillas del HTML de los bloques
+ * `wp:html`, y las clases dejaban de existir — la página salía sin formato.
+ *
+ * @package nestjslatam
+ */
+
+defined( 'ABSPATH' ) || exit;
+?>
+<section class="nl-hero" style="padding:4rem 1.5rem">
+  <span class="nl-hero__eyebrow">Aviso legal</span>
+  <h1 class="nl-hero__title" style="font-size:clamp(1.8rem,4vw,2.5rem)">Qué es esto<br>y qué <em>no</em> es</h1>
+  <p class="nl-hero__lead">En claro y sin letra pequeña, porque si hay que leerlo dos veces está mal escrito.</p>
+</section>
+
+<section class="nl-section" style="padding-top:2rem">
+
+  <h2 class="nl-section__title" style="text-align:left;border:0;padding:0">Proyecto de comunidad, no oficial</h2>
+  <p><strong>NestJS Latam no está afiliado, asociado, autorizado ni respaldado por NestJS ni por sus autores.</strong> Somos una comunidad hispanohablante independiente que construye librerías y material de aprendizaje para el ecosistema de NestJS.</p>
+  <p>«NestJS», su logotipo y sus marcas asociadas pertenecen a sus respectivos titulares. Los mencionamos aquí únicamente para identificar la tecnología sobre la que trabajamos, que es lo que la ley permite y el sentido común aconseja.</p>
+  <p>Si buscas la documentación oficial del framework, está en <a href="https://docs.nestjs.com/">docs.nestjs.com</a>. NestJS fue creado por <a href="https://github.com/kamilmysliwiec">Kamil&nbsp;Myśliwiec</a> y se publica bajo licencia MIT.</p>
+
+  <h2 class="nl-section__title" style="text-align:left;border:0;padding:0;margin-top:3rem">El software se entrega «tal cual»</h2>
+  <p>Nuestras librerías se publican bajo <a href="https://opensource.org/licenses/MIT">licencia MIT</a>, cuyo texto incluye esta cláusula, y conviene leerla de verdad:</p>
+  <blockquote><p>El software se proporciona «tal cual», sin garantía de ningún tipo, expresa o implícita, incluidas entre otras las garantías de comerciabilidad, idoneidad para un fin determinado y no infracción. En ningún caso los autores o titulares del copyright serán responsables de reclamación, daño u otra responsabilidad alguna.</p></blockquote>
+  <p>Dicho sin lenguaje jurídico: <strong>si lo pones en producción, la responsabilidad es tuya.</strong> Nosotros ponemos el código, las pruebas y los números medidos para que puedas decidir con información; la decisión sigue siendo tuya.</p>
+
+  <div class="nl-note nl-note--warn">
+    <p class="nl-note__title">Y lo decimos antes, no después</p>
+    <p>La API de estas librerías todavía se mueve y ha roto en más de una versión. <strong>Clava una versión exacta.</strong> Cada repositorio dice en su README qué está probado y qué no, con cifras que salen de ejecutar las pruebas y no de prometerlas. Si algo está roto, lo verás escrito allí antes de descubrirlo tú.</p>
+  </div>
+
+  <h2 class="nl-section__title" style="text-align:left;border:0;padding:0;margin-top:3rem">El contenido del sitio</h2>
+  <p>Los artículos, guías y documentación de este portal se publican bajo la misma licencia MIT y se pueden citar, traducir y reutilizar citando la fuente.</p>
+  <p>Describen lo que aprendimos construyendo estas librerías, incluidos nuestros errores. <strong>No son asesoramiento profesional</strong>, y lo que funciona en nuestro contexto puede no funcionar en el tuyo. Cuando un artículo afirma que algo ocurre, es porque lo reprodujimos ejecutándolo; cuando no estamos seguros, lo decimos.</p>
+
+  <h2 class="nl-section__title" style="text-align:left;border:0;padding:0;margin-top:3rem">Enlaces a terceros</h2>
+  <p>Enlazamos a sitios que no controlamos —GitHub, npm, la documentación de NestJS y otros—. No respondemos de su contenido, su disponibilidad ni sus políticas de privacidad.</p>
+
+  <h2 class="nl-section__title" style="text-align:left;border:0;padding:0;margin-top:3rem">Datos y cuentas</h2>
+  <p>Si te registras, guardamos lo mínimo que WordPress necesita para tener una cuenta: nombre de usuario, correo y las contribuciones que publiques. No vendemos ni cedemos esos datos.</p>
+  <p>Puedes pedir en cualquier momento que borremos tu cuenta escribiéndonos desde <a href="/contact/">Contacto</a>.</p>
+
+  <h2 class="nl-section__title" style="text-align:left;border:0;padding:0;margin-top:3rem">Quiénes estamos detrás</h2>
+  <p>NestJS Latam está impulsado por <a href="https://beyondnet.info/">BeyondNetCode</a>, junto a la comunidad. El código de todo lo que publicamos —incluido el diseño de este portal— está abierto en <a href="https://github.com/nestjslatam">GitHub</a>.</p>
+
+  <div class="nl-note">
+    <p class="nl-note__title">¿Algo aquí está mal?</p>
+    <p>Si eres titular de una marca mencionada en este sitio y quieres que cambiemos cómo la referenciamos, escríbenos desde <a href="/contact/">Contacto</a> y lo hacemos. No hace falta ningún trámite.</p>
+  </div>
+
+</section>

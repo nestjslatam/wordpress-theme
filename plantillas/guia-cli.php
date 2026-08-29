@@ -1,0 +1,155 @@
+<?php
+/**
+ * Contenido de la página. Vive en el tema y no en la base de datos:
+ * el importador de WordPress escapa las comillas del HTML de los bloques
+ * `wp:html`, y las clases dejaban de existir — la página salía sin formato.
+ *
+ * @package nestjslatam
+ */
+
+defined( 'ABSPATH' ) || exit;
+?>
+<section class="nl-hero" style="padding:5rem 1.5rem">
+  <span class="nl-hero__eyebrow">@nestjslatam/ddd-cli</span>
+  <h1 class="nl-hero__title" style="font-size:clamp(2rem,5vw,3rem)">La guía del <em>CLI</em></h1>
+  <p class="nl-hero__lead">Una herramienta que lee <strong>la librería que tú tienes instalada</strong>. No genera plantillas a ciegas: parsea tus <code>.d.ts</code> con la API del compilador de TypeScript, así que describe tu proyecto y no un ideal.</p>
+  <div class="nl-hero__actions">
+    <a class="nl-btn" href="#instalar">Empezar</a>
+    <a class="nl-btn nl-btn--ghost" href="https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md">La guía extendida</a>
+  </div>
+</section>
+
+<div class="nl-toc-inline">
+  <a href="#instalar">Instalar</a>
+  <a href="#orientarse">Orientarse</a>
+  <a href="#andamiar">Andamiar</a>
+  <a href="#auditar">Auditar</a>
+  <a href="#mcp">Servidor MCP</a>
+  <a href="#comandos">Todos los comandos</a>
+</div>
+
+<section class="nl-section" id="instalar" style="padding-top:0">
+  <div class="nl-steps">
+
+    <div class="nl-step">
+      <h3 class="nl-step__title">Instalar</h3>
+      <p>Como dependencia de desarrollo. No es una dependencia de ejecución: tu aplicación no lo necesita en producción.</p>
+      <pre><code>npm install -D @nestjslatam/ddd-cli</code></pre>
+    </div>
+
+    <div class="nl-step" id="orientarse">
+      <h3 class="nl-step__title">Orientarse: <code>ddd list</code></h3>
+      <p>Lo primero que conviene hacer en un proyecto que no conoces. Imprime cada pieza que exporta tu versión de la librería, <strong>agrupada por cómo se usa</strong>.</p>
+      <div class="nl-term">
+        <div class="nl-term__bar"><span class="nl-term__dot"></span><span class="nl-term__dot"></span><span class="nl-term__dot"></span><span class="nl-term__title">npx ddd list</span></div>
+<pre><code>  extend     hereda de ella
+  implement  cumple la interfaz
+  compose    el agregado delega en ella
+  use        se llama directamente
+
+  Aggregates
+  compose    AggregateValidationOrchestrator
+  extend     DddAggregateRoot                 extends AggregateRoot
+
+  Value Objects
+  extend     DddValueObject      extends AbstractNotifyPropertyChanged
+  extend     IdValueObject       extends DddValueObject
+  extend     NumberValueObject   extends DddValueObject
+  extend     StringValueObject   extends DddValueObject
+  …
+  66 símbolos · ddd explain &lt;nombre&gt; para cualquiera de ellos</code></pre>
+      </div>
+      <p>Esa división en cuatro es casi todo lo que hay que entender del diseño. <strong><code>compose</code> es la que más se confunde</strong>: <code>BrokenRulesManager</code>, <code>ValidatorRuleManager</code> y <code>TrackingStateManager</code> son colaboradores que un agregado <em>tiene</em>, no bases de las que se hereda.</p>
+    </div>
+
+    <div class="nl-step" id="andamiar">
+      <h3 class="nl-step__title">Andamiar: <code>new</code> y <code>extend</code></h3>
+      <pre><code>npx ddd new value-object OrderTotal --kind number
+npx ddd new validator OrderTotalRules --for OrderTotal
+npx ddd extend AbstractRuleValidator ShippingRules</code></pre>
+      <p><code>extend</code> deriva el contrato de las declaraciones instaladas, así que funciona con bases que nunca ha visto — incluida una que hayas escrito tú en tu propio fork.</p>
+      <p><strong>No escribe nada antes de que veas la lista y confirmes:</strong></p>
+      <div class="nl-term">
+        <div class="nl-term__bar"><span class="nl-term__dot"></span><span class="nl-term__dot"></span><span class="nl-term__dot"></span><span class="nl-term__title">npx ddd new value-object Sku</span></div>
+<pre><code>  Sku extends StringValueObject
+
+  Ficheros bajo src
+  create  shared/valueobjects/sku.ts  value-object
+
+  1 nuevo · 0 ya existentes
+  ¿Escribir este fichero? (s/N)</code></pre>
+      </div>
+      <p>Y todo lo que emite <strong>pasa su propia auditoría</strong>: las plantillas no son sólo plausibles, cumplen las cuatro reglas que <code>validate</code> aplica.</p>
+    </div>
+
+    <div class="nl-step" id="auditar">
+      <h3 class="nl-step__title">Auditar: <code>ddd validate</code></h3>
+      <p>Cuatro reglas, cada una un error que la librería hace fácil y <strong>silencioso</strong>. Los cuatro compilan. Los cuatro pasan los tests.</p>
+      <div class="nl-cmds">
+        <div class="nl-cmd">
+          <span class="nl-cmd__name">factory-checks-validity</span>
+          <p class="nl-cmd__what">Un <code>create()</code> que no comprueba <code>isValid</code>. <strong>Devuelve objetos inválidos sin error.</strong></p>
+        </div>
+        <div class="nl-cmd">
+          <span class="nl-cmd__name">super-add-validators</span>
+          <p class="nl-cmd__what">Un override que no encadena. <strong>Los validadores de la base desaparecen.</strong></p>
+        </div>
+        <div class="nl-cmd">
+          <span class="nl-cmd__name">no-subclass-state-in-add-validators</span>
+          <p class="nl-cmd__what">Leer un campo propio dentro de <code>addValidators()</code>. <strong>Revienta en cada construcción</strong> — así se publicó rota <code>NumberValueObject</code> durante dos versiones.</p>
+        </div>
+        <div class="nl-cmd">
+          <span class="nl-cmd__name">handler-commits-events</span>
+          <p class="nl-cmd__what">Un handler sin <code>commit()</code>. <strong>El comando triunfa y ningún evento se despacha.</strong></p>
+        </div>
+      </div>
+      <p>Además señala las llamadas a <code>isValid</code> que no cuadran con tu versión instalada, que es la parte mecánica de migrar de la 2.x a la 3.x:</p>
+      <div class="nl-term">
+        <div class="nl-term__bar"><span class="nl-term__dot"></span><span class="nl-term__dot"></span><span class="nl-term__dot"></span><span class="nl-term__title">npx ddd validate</span></div>
+<pre><code>error  3  Order.create() llama a isValid(), pero la librería
+          instalada lo declara como getter</code></pre>
+      </div>
+      <p>Códigos de salida: <code>0</code> limpio, <code>1</code> con violaciones. <strong>Se puede poner en CI tal cual.</strong></p>
+    </div>
+
+    <div class="nl-step" id="mcp">
+      <h3 class="nl-step__title">Servidor MCP, sin clave de API</h3>
+      <p>Si ya trabajas en Claude Code, Codex o Cursor, ese agente tiene modelo y credenciales. El CLI no necesita los suyos.</p>
+      <pre><code>claude mcp add ddd -- npx -y @nestjslatam/ddd-cli mcp</code></pre>
+      <p>Aparecen siete herramientas: <code>ddd_list</code>, <code>ddd_describe</code>, <code>ddd_new</code>, <code>ddd_extend</code>, <code>ddd_validate</code>, <code>ddd_aggregate_schema</code> y <code>ddd_render_aggregate</code>.</p>
+      <p><strong>El reparto de trabajo es lo importante.</strong> El agente decide la frontera del agregado, las invariantes y los nombres — criterio. El CLI hace lo que un modelo hace mal: leer las declaraciones instaladas con exactitud, renderizar de forma determinista y auditar contra el idioma.</p>
+      <p>Y hay un bucle de corrección que merece señalar: el agente produce una <em>especificación</em>, el CLI la renderiza, y una especificación que no cumple el esquema vuelve con los problemas <strong>campo por campo</strong>, así que el agente se corrige solo sin que haya nadie mirando.</p>
+      <div class="nl-note">
+        <p class="nl-note__title">Nada toca el disco sin permiso</p>
+        <p>Ninguna llamada escribe salvo que pase <code>write: true</code>, y aun así <strong>jamás sobrescribe un fichero existente</strong>. Un agente trabajando sin supervisión no debe pisar código de dominio escrito a mano.</p>
+      </div>
+      <p><a href="/como-conectar-el-cli-a-tu-agente-por-mcp/">El How-To completo, con un prompt que funciona →</a></p>
+    </div>
+
+  </div>
+</section>
+
+<section class="nl-section" id="comandos">
+  <div class="nl-section__head">
+    <h2 class="nl-section__title">Todos los comandos</h2>
+    <p class="nl-section__lead">Cinco de los siete no tocan un modelo jamás.</p>
+  </div>
+  <div class="nl-cmds">
+    <div class="nl-cmd"><span class="nl-cmd__name">ddd list<br><small style="color:var(--nl-text-faint)">alias: ls</small></span><p class="nl-cmd__what">Cada estereotipo, agrupado, con su rol. <strong>Sin modelo.</strong></p></div>
+    <div class="nl-cmd"><span class="nl-cmd__name">ddd explain &lt;símbolo&gt;<br><small style="color:var(--nl-text-faint)">alias: why</small></span><p class="nl-cmd__what">Contrato, qué implementar, un ejemplo. Necesita modelo salvo con <code>--raw</code>.</p></div>
+    <div class="nl-cmd"><span class="nl-cmd__name">ddd new &lt;tipo&gt; &lt;Nombre&gt;<br><small style="color:var(--nl-text-faint)">alias: n</small></span><p class="nl-cmd__what">Value object, validador, evento, excepción, agregado o enum. <strong>Sin modelo.</strong></p></div>
+    <div class="nl-cmd"><span class="nl-cmd__name">ddd extend &lt;Base&gt; &lt;Nombre&gt;<br><small style="color:var(--nl-text-faint)">alias: x</small></span><p class="nl-cmd__what">Subclase con los miembros abstractos esbozados. <strong>Sin modelo.</strong></p></div>
+    <div class="nl-cmd"><span class="nl-cmd__name">ddd validate [ruta]<br><small style="color:var(--nl-text-faint)">alias: check</small></span><p class="nl-cmd__what">Las cuatro reglas del idioma. <strong>Sin modelo, apto para CI.</strong></p></div>
+    <div class="nl-cmd"><span class="nl-cmd__name">ddd generate:aggregate<br><small style="color:var(--nl-text-faint)">alias: ga</small></span><p class="nl-cmd__what">Modela un agregado desde una descripción en prosa. <strong>Necesita modelo.</strong></p></div>
+    <div class="nl-cmd"><span class="nl-cmd__name">ddd mcp</span><p class="nl-cmd__what">Servidor MCP para un agente de IA. <strong>Sin clave de API.</strong></p></div>
+  </div>
+</section>
+
+<section class="nl-cta">
+  <h2 class="nl-cta__title">La guía extendida</h2>
+  <p class="nl-cta__lead">Construye el dominio de transporte marítimo de Eric Evans desde cero hasta diez ficheros que compilan, comando a comando. <strong>Cada línea de salida se produjo ejecutando la herramienta</strong>, no se escribió de memoria.</p>
+  <div class="nl-hero__actions">
+    <a class="nl-btn" href="https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md">Abrir la guía completa</a>
+    <a class="nl-btn nl-btn--ghost" href="https://docs.nestjslatam.dev/cli/">Referencia del CLI</a>
+  </div>
+</section>
