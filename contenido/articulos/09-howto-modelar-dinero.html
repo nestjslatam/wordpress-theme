@@ -1,0 +1,103 @@
+<!-- meta: cat=How-To | tags=DDD,Value Objects,Dinero | resumen=Un número decimal no es dinero. Cómo modelarlo para que sumar soles con dólares sea imposible de escribir. -->
+<!-- wp:paragraph -->
+<p>El bug de dinero más caro que he visto costó cuatro días de conciliación contable, y el código que lo produjo tenía este aspecto:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>const total = precioProducto + costeEnvio;   // uno en PEN, otro en USD</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Compila. No lanza. Devuelve un número perfectamente creíble. Y está mal.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Un importe sin moneda no es dinero</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>La moneda no es un adorno del importe: forma parte de lo que el valor <em>es</em>. Modelarlos juntos convierte el error de arriba en algo que no se puede escribir:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>interface IMoneyProps {
+  amount: number;
+  currency: string;
+}
+
+export class Money extends DddValueObject&lt;IMoneyProps&gt; {
+  static create(amount: number, currency = 'PEN'): Money {
+    const money = new Money({ amount, currency });
+    if (!money.isValid) {
+      throw new BrokenRulesException('Money', money.brokenRules.getBrokenRules());
+    }
+    return money;
+  }
+
+  add(other: Money): Money {
+    if (other.props.currency !== this.props.currency) {
+      throw new InvalidOperationException(
+        `No se puede sumar ${other.props.currency} a ${this.props.currency}`,
+      );
+    }
+    return Money.create(this.props.amount + other.props.amount, this.props.currency);
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Ahora <code>precio.add(envio)</code> lanza en el momento en que las monedas difieren, en lugar de producir un número sin sentido que aparece en un informe tres semanas después.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Devuelve uno nuevo, no mutes</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><code>add()</code> devuelve un <code>Money</code> <strong>nuevo</strong>. Los value objects son inmutables, y aquí importa más que en otros sitios: si mutaras el importe de un objeto compartido, cambiarías el precio bajo los pies de quien lo tuviera guardado en una variable.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Los decimales</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><code>0.1 + 0.2 !== 0.3</code> también en tu aplicación de facturación. Hay dos caminos y conviene elegir a propósito:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<table>
+<tr><th>Enfoque</th><th>Cuándo</th><th>Coste</th></tr>
+<tr><td><strong>Enteros en la unidad mínima</strong> (céntimos)</td><td>Contabilidad, pagos, cualquier cosa que se concilie</td><td>Hay que convertir al entrar y al salir</td></tr>
+<tr><td><strong>Decimal con validación de escala</strong></td><td>Catálogos, precios de escaparate</td><td>Sigue habiendo error de coma flotante en operaciones largas</td></tr>
+</table>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Si tu dinero pasa por una conciliación, usa enteros. Si sólo se muestra, un decimal con la escala validada basta — pero valida la escala:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>if (Math.round(amount * 100) !== amount * 100) {
+  this.addBrokenRule('amount', 'Como máximo dos decimales');
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Formatear no es responsabilidad del valor</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><code>Money</code> guarda el importe y la moneda. Cómo se ve —con símbolo, con código, en formato contable, en palabras— es una decisión de presentación, y cambia según dónde se muestre. Sepáralo:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>const f = new MoneyFormatter();
+f.format(precio);              // 'S/ 1,999.00'
+f.formatWithCode(precio);      // '1,999.00 PEN'
+f.formatAccounting(deuda);     // '(1,999.00)'
+f.formatCompact(precio);       // 'S/ 2.0K'</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Un value object que sabe formatearse a sí mismo acaba con un método por cada sitio donde se muestra, y todos viven en la capa de dominio sin pertenecer a ella.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<div class="nl-note">
+  <p class="nl-note__title">Ya está hecho</p>
+  <p><code>Money</code> con sus seis formateadores y validación ISO 4217 está en <a href="https://docs.nestjslatam.dev/valueobjects/"><code>@nestjslatam/ddd-valueobjects</code></a>, junto con otros once. Si el tuyo va a acabar pareciéndose, empieza por ahí.</p>
+</div>
+<!-- /wp:html -->

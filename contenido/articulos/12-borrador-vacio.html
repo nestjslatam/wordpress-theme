@@ -1,0 +1,101 @@
+<!-- meta: cat=Ingeniería | tags=DDD,Modelado,Invariantes | resumen=Escribimos «un pedido tiene artículos» como invariante y crear un pedido se volvió imposible. Una invariante no siempre es válida en todo el ciclo de vida. -->
+<!-- wp:paragraph -->
+<p>Éste fue el error de modelado más caro que cometimos, y es instructivo porque el razonamiento que lleva a él es correcto hasta el último paso.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">El razonamiento</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Un pedido tiene artículos. Un pedido sin artículos no es un pedido. Eso es una invariante, y las invariantes van en el validador del agregado:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>export class OrderItemsValidator extends AbstractRuleValidator&lt;Order&gt; {
+  public addRules(): void {
+    if (this.subject.props.items.length === 0) {
+      this.addBrokenRule('props.items', 'El pedido debe tener al menos un artículo');
+    }
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Impecable. Y rompe la aplicación entera.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Lo que pasa</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>const order = Order.create(cliente, direccion);
+order.isValid;   // false ← recién creado por su propia fábrica</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p><code>Order.create()</code> construye un pedido con <code>items: []</code>, porque un pedido nace vacío y se le van añadiendo cosas. Y como la fábrica comprueba <code>isValid</code> antes de devolver, <strong>crear un pedido pasó a ser imposible</strong>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El agregado rechazaba el objeto que él mismo acababa de construir.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Dónde está el fallo del razonamiento</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>«Un pedido tiene artículos» es verdad para un pedido <em>confirmado</em>. Es falsa para un carrito. Y son <strong>el mismo agregado en dos momentos distintos de su vida</strong>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>La tentación es partir el modelo en dos clases, <code>Cart</code> y <code>Order</code>. A veces es lo correcto. Pero si comparten identidad —el carrito <em>se convierte</em> en el pedido, conservando su id— no son dos cosas: son una con estados.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">La corrección</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>export class OrderItemsValidator extends AbstractRuleValidator&lt;Order&gt; {
+  public addRules(): void {
+    // Un borrador puede estar vacío; a partir de CONFIRMED, no.
+    if (this.subject.isDraft()) return;
+
+    if (this.subject.props.items.length === 0) {
+      this.addBrokenRule('props.items', 'El pedido debe tener al menos un artículo');
+    }
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>La invariante no desaparece: se <strong>fecha</strong>. Empieza a aplicarse en el momento del ciclo de vida en que es cierta.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">La pregunta que ahorra el error</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Cada vez que escribas una invariante en un agregado con estados, pregúntate:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<blockquote><p><strong>¿Esto es cierto desde el instante en que el objeto nace?</strong></p></blockquote>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Si la respuesta es «bueno, en cuanto el usuario haya…», entonces no es una invariante del agregado: es una <strong>precondición de una transición</strong>, y su sitio es el método que la ejecuta:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>confirm(): void {
+  if (this.props.items.length === 0) {
+    throw new InvalidOperationException('No se puede confirmar un pedido sin artículos');
+  }
+  // ...
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Que además devuelve un <strong>409</strong> en lugar de un 422, y eso es lo correcto: nada está mal formado y ningún valor es inválido — el pedido simplemente no está en un estado que permita la operación. La distinción está desarrollada en <a href="/estructura-contra-significado-por-que-400-422-y-409-no-son-lo-mismo/">Estructura contra significado</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">La regla</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Una invariante de agregado tiene que ser cierta en todos los estados en los que el agregado puede existir.</strong> Si sólo es cierta a partir de cierto punto, o es condicional al estado, o pertenece a la transición y no al agregado.</p>
+<!-- /wp:paragraph -->

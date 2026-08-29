@@ -65,10 +65,11 @@ def slugificar(texto: str) -> str:
 PAGINAS = [
     ('Inicio',        'inicio',        'portada.html',      0),
     ('Documentación', 'documentacion', 'documentacion.html', 1),
-    ('Comunidad',     'comunidad',     'comunidad.html',    2),
+    ('Guías',         'guias',         'guias.html',        2),
+    ('Comunidad',     'comunidad',     'comunidad.html',    3),
     # El blog va vacío a propósito: WordPress lo rellena al designarlo como
     # "página de entradas" en Ajustes -> Lectura.
-    ('Blog',          'blog',          None,                3),
+    ('Blog',          'blog',          None,                4),
 ]
 
 ARTICULOS = [
@@ -84,16 +85,44 @@ ARTICULOS = [
      '05-orden-de-construccion.html'),
     ('MongoDB para event sourcing: los dos requisitos que nadie te cuenta',
      '06-mongodb-replica-set.html'),
+    ('Cómo montar tu primer agregado, paso a paso',
+     '07-howto-primer-agregado.html'),
+    ('Cómo conectar el CLI a tu agente por MCP',
+     '08-howto-cli-mcp.html'),
+    ('Cómo modelar dinero sin equivocarte',
+     '09-howto-modelar-dinero.html'),
+    ('Cómo probar un agregado',
+     '10-howto-probar-un-agregado.html'),
+    ('Cómo migrar de ddd-lib 3 a 4',
+     '11-howto-migrar-ddd-lib-4.html'),
+    ('Por qué un borrador puede estar vacío',
+     '12-borrador-vacio.html'),
 ]
 
+# Menú de dos niveles: los hijos llevan `padre` con la etiqueta del suyo.
+# Páginas que ya existen en el sitio y este fichero no crea. Se listan para
+# que la comprobación de enlaces no las dé por rotas.
+YA_EXISTEN = {'about', 'contact'}
+
 MENU = [
-    ('Inicio',        f'{DOMINIO}/inicio/'),
-    ('Documentación', f'{DOMINIO}/documentacion/'),
-    ('Blog',          f'{DOMINIO}/blog/'),
-    ('Guía',          'https://docs.nestjslatam.dev/guia/'),
-    ('CLI',           'https://docs.nestjslatam.dev/cli/'),
-    ('Comunidad',     f'{DOMINIO}/comunidad/'),
-    ('GitHub',        'https://github.com/nestjslatam'),
+    ('Inicio',            f'{DOMINIO}/inicio/',                                        None),
+    ('Documentación',     f'{DOMINIO}/documentacion/',                                 None),
+    ('Guía de ddd-lib',   'https://docs.nestjslatam.dev/guia/',                        'Documentación'),
+    ('Referencia de API', 'https://docs.nestjslatam.dev/guia/api',                     'Documentación'),
+    ('Value objects',     'https://docs.nestjslatam.dev/valueobjects/',                'Documentación'),
+    ('Event sourcing',    'https://docs.nestjslatam.dev/event-sourcing/',              'Documentación'),
+    ('Guías y How-To',    f'{DOMINIO}/guias/',                                         None),
+    ('Tu primer agregado', f'{DOMINIO}/como-montar-tu-primer-agregado-paso-a-paso/',   'Guías y How-To'),
+    ('Probar un agregado', f'{DOMINIO}/como-probar-un-agregado/',                      'Guías y How-To'),
+    ('Modelar dinero',    f'{DOMINIO}/como-modelar-dinero-sin-equivocarte/',           'Guías y How-To'),
+    ('Migrar a la 4.0.0', f'{DOMINIO}/como-migrar-de-ddd-lib-3-a-4/',                  'Guías y How-To'),
+    ('CLI',               'https://docs.nestjslatam.dev/cli/',                         None),
+    ('Guía completa del CLI', 'https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md', 'CLI'),
+    ('Servidor MCP',      'https://docs.nestjslatam.dev/cli/mcp',                      'CLI'),
+    ('Conectarlo a tu agente', f'{DOMINIO}/como-conectar-el-cli-a-tu-agente-por-mcp/', 'CLI'),
+    ('Blog',              f'{DOMINIO}/blog/',                                          None),
+    ('Comunidad',         f'{DOMINIO}/comunidad/',                                     None),
+    ('GitHub',            'https://github.com/nestjslatam',                            None),
 ]
 
 # ── Construcción ───────────────────────────────────────────────────────────
@@ -161,14 +190,20 @@ for titulo, fichero in ARTICULOS:
 # El menú: cada entrada es un post de tipo nav_menu_item con su metadatos.
 # Se declaran como enlaces personalizados para no depender de resolver los ids
 # de las páginas, que el importador reasigna.
-for posicion, (etiqueta, url) in enumerate(MENU, start=1):
+# Dos pasadas: la primera reserva un id por entrada para que la segunda pueda
+# apuntar de hijo a padre. Sin reservarlos antes, un hijo declarado antes que
+# su padre quedaría colgando en la raíz.
+ids_menu = {etiqueta: siguiente_id + 1 + i for i, (etiqueta, _, _) in enumerate(MENU)}
+
+for posicion, (etiqueta, url, padre) in enumerate(MENU, start=1):
+    propio = ids_menu[etiqueta]
     partes.append(
         item(
             etiqueta, f'menu-{slugificar(etiqueta)}', '', 'nav_menu_item', posicion,
             metas=[
                 ('_menu_item_type', 'custom'),
-                ('_menu_item_menu_item_parent', '0'),
-                ('_menu_item_object_id', str(siguiente_id + 1)),
+                ('_menu_item_menu_item_parent', str(ids_menu[padre]) if padre else '0'),
+                ('_menu_item_object_id', str(propio)),
                 ('_menu_item_object', 'custom'),
                 ('_menu_item_target', ''),
                 ('_menu_item_classes', 'a:1:{i:0;s:0:"";}'),

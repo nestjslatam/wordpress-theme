@@ -1,0 +1,68 @@
+<!-- meta: cat=How-To | tags=Migración,DDD,TypeScript | resumen=Ocho comportamientos cambiaron y el compilador no detecta ninguno. La lista, en orden de probabilidad de que te afecte. -->
+<!-- wp:paragraph -->
+<p>La <code>4.0.0</code> de <code>ddd-lib</code> es la primera con pruebas sobre las clases que extiendes, y llegar ahí destapó 34 defectos. Arreglarlos cambió comportamiento observable en ocho sitios. <strong>El compilador no detecta ninguno de los ocho</strong>, así que no hay nada que buscar: hay que repasarlos.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Antes: si vienes de 2.x</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>- if (!aggregate.isValid()) {
++ if (!aggregate.isValid) {</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Ése sí lo encuentra el compilador (<code>TS6234</code>). Si consumes desde JavaScript, <code>npx ddd validate</code> señala cada llamada leyendo cómo lo declara tu versión instalada. La historia completa de por qué esto pudo pasar desapercibido está en <a href="/el-guard-que-nunca-se-disparo/">El guard que nunca se disparó</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Los ocho de la 4.0.0</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<table>
+<tr><th>#</th><th>Qué cambió</th><th>Qué hacer</th></tr>
+<tr><td>1</td><td><code>validate()</code> limpia las reglas antes de re-derivarlas</td><td><strong>Quita tu apaño</strong> con <code>brokenRules.clear()</code>. Ahora sobra</td></tr>
+<tr><td>2</td><td><code>clone()</code> y <code>getCopy()</code> devuelven copias reales</td><td>Si dependías de que compartieran estado, eso era el bug. Vuelve a suscribir los manejadores en la copia</td></tr>
+<tr><td>3</td><td><code>IdValueObject</code> canonicaliza los UUID a minúsculas</td><td>Pasa a minúsculas los guardados, o espéralos así al leer</td></tr>
+<tr><td>4</td><td>Las opciones de <code>StringValueObject</code> ya se aplican</td><td><code>allowEmpty</code>, <code>trimWhitespace</code>, <code>minLength</code>, <code>maxLength</code> se ignoraban. Valores que pasaban pueden fallar ahora</td></tr>
+<tr><td>5</td><td><code>IdValueObject.setValue()</code> lanza si no es UUID</td><td>Antes lo aceptaba en silencio. Revisa dónde construyes ids</td></tr>
+<tr><td>6</td><td><code>DddEnum.getAll()</code> devuelve un array nuevo</td><td><code>getAll() === getAll()</code> ya no es cierto. Compara contenidos</td></tr>
+<tr><td>7</td><td>El comparador de estado recibe <code>(definedState, queryState)</code></td><td>Si tienes uno propio, revisa el orden de los argumentos</td></tr>
+<tr><td>8</td><td>La detección de cambios anidados se dispara</td><td>Tus repositorios pueden ver escrituras que antes se saltaban</td></tr>
+</table>
+<!-- /wp:html -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">El orden en que repasarlos</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Los tres primeros son los que más gente tiene. El <strong>1</strong> porque el apaño de <code>clear()</code> era la forma habitual de sortear el bug, y ahora limpia dos veces —inofensivo, pero es código muerto que conviene borrar mientras te acuerdas de por qué estaba.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El <strong>3</strong> es el que puede morder en producción sin avisar: si tienes UUIDs guardados en mayúsculas y el código nuevo los canonicaliza a minúsculas, una búsqueda por id deja de encontrar filas. No falla: no encuentra. Que es peor.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El <strong>4</strong> es el que más ruido hace en los tests, y es ruido bueno: valores que llevaban tiempo colándose empiezan a fallar. Si te aparecen fallos nuevos ahí, no los silencies — mira qué estaba pasando.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Cómo comprobarlo</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>npm i @nestjslatam/ddd-lib@4.0.0
+npx ddd validate           # audita contra la versión que acabas de instalar
+npm test</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p><code>ddd validate</code> lee los <code>.d.ts</code> de tu <code>node_modules</code>, así que audita contra la versión real y no contra una tabla de compatibilidad que alguien tendría que mantener al día.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<div class="nl-note nl-note--warn">
+  <p class="nl-note__title">Y clava la versión</p>
+  <p>Sin <code>^</code>. La promesa es que a partir de la <code>4.0.0</code> no habrá cambios incompatibles sin un ciclo de obsolescencia. Esa promesa se gana a lo largo de un ciclo de versiones, no anunciándola — júzgala en la <code>4.1.0</code>.</p>
+</div>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>El <a href="https://github.com/nestjslatam/ddd/blob/main/CHANGELOG.md">CHANGELOG</a> explica el razonamiento de cada cambio, y la <a href="https://docs.nestjslatam.dev/guia/api">referencia de API</a> tiene la tabla de qué cambió entre versiones.</p>
+<!-- /wp:paragraph -->

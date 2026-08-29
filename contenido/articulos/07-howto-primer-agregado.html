@@ -1,0 +1,154 @@
+<!-- meta: cat=How-To | tags=NestJS,DDD,Tutorial | resumen=De un proyecto vacío a un agregado que valida sus propias reglas, paso a paso. Veinte minutos. -->
+<!-- wp:paragraph -->
+<p>Vamos a construir un <code>Product</code> completo: un value object con reglas, un agregado con una invariante que sólo él puede juzgar, y el endpoint que devuelve <code>422</code> cuando algo no cuadra. Todo el código está sacado del <a href="https://github.com/nestjslatam/ddd">repositorio de ejemplo</a>, donde corre en CI.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Paso 1 · Instalar</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>npm i @nestjslatam/ddd-lib@4.0.0 @nestjs/cqrs</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Sin <code>^</code>. La API se ha movido entre versiones mayores y el compilador no detecta la mayoría de los cambios; clavar la versión es lo que te deja actualizar cuando <em>tú</em> decidas.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Paso 2 · Un value object con reglas</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>import { StringValueObject, AbstractRuleValidator, BrokenRulesException }
+  from '@nestjslatam/ddd-lib';
+
+class NameLengthValidator extends AbstractRuleValidator&lt;Name&gt; {
+  public addRules(): void {
+    const value = this.subject.getValue();
+
+    // OJO: la condición es verdadera cuando la regla está ROTA.
+    if (value.length &lt; 3)   this.addBrokenRule('value', 'Mínimo 3 caracteres');
+    if (value.length &gt; 100) this.addBrokenRule('value', 'Máximo 100 caracteres');
+  }
+}
+
+export class Name extends StringValueObject {
+  static create(value: string): Name {
+    const name = new Name(value);
+
+    if (!name.isValid) {                                   // ← imprescindible
+      throw new BrokenRulesException('Name', name.brokenRules.getBrokenRules());
+    }
+
+    return name;
+  }
+
+  override addValidators(): void {
+    super.addValidators();                                 // ← imprescindible
+    this.validatorRules.add(new NameLengthValidator(this));
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Las dos líneas marcadas son el 80 % de los fallos que verás al empezar, y ninguna de las dos produce un error si falta:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<ul>
+<li><strong>Sin <code>if (!name.isValid)</code></strong> → <code>create()</code> devuelve objetos inválidos, en silencio.</li>
+<li><strong>Sin <code>super.addValidators()</code></strong> → los validadores de la clase base desaparecen, y <code>''</code> pasa a ser un nombre válido.</li>
+</ul>
+<!-- /wp:html -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Paso 3 · El agregado</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>export class Product extends DddAggregateRoot&lt;Product, IProductProps&gt; {
+  private constructor(props: IProductProps, id?: IdValueObject) {
+    super(props, { id });          // el id va en la BOLSA DE OPCIONES
+    this.trackingState.markAsNew();
+  }
+
+  static create(name: Name, description: Description, price: Price): Product {
+    const product = new Product({ name, description, price, status: ProductStatus.ACTIVE });
+
+    if (!product.isValid) {
+      throw new BrokenRulesException('Product', product.brokenRules.getBrokenRules());
+    }
+
+    product.apply(new ProductCreatedEvent(product.id.getValue()));
+    return product;
+  }
+
+  override addValidators(): void {
+    super.addValidators();
+    this.validatorRules.add(new ProductBusinessRulesValidator(this));
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Tres detalles que cuestan una tarde si los descubres solo: <strong>dos argumentos de tipo</strong> (<code>&lt;Product, IProductProps&gt;</code>), <strong>el id va dentro de <code>{ id }</code></strong>, y <strong><code>markAsNew()</code> lo llamas tú</strong> — el seguimiento de estado no adivina.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Paso 4 · Una regla que sólo el agregado puede ver</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>export class ProductBusinessRulesValidator extends AbstractRuleValidator&lt;Product&gt; {
+  public addRules(): void {
+    const { name, description } = this.subject.props;
+
+    if (description.getValue().length &lt;= name.getValue().length) {
+      this.addBrokenRule('props.description', 'La descripción debe ser más larga que el nombre');
+    }
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Aquí es donde el patrón empieza a pagar. <code>name</code> es válido. <code>description</code> es válida. La <strong>combinación</strong> no lo es, y ningún value object puede saberlo porque ninguno ve al otro. La raíz de agregado es el único sitio del sistema desde donde esa frase se puede escribir.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Paso 5 · El handler</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>@CommandHandler(CreateProductCommand)
+export class CreateProductCommandHandler implements ICommandHandler&lt;CreateProductCommand, string&gt; {
+  constructor(
+    private readonly publisher: EventPublisher,
+    private readonly repository: ProductRepository,
+  ) {}
+
+  async execute(command: CreateProductCommand): Promise&lt;string&gt; {
+    const product = Product.create(
+      Name.create(command.name),
+      Description.create(command.description),
+      Price.create(command.price),
+    );
+
+    await this.repository.save(product);                  // 1. persistir
+    this.publisher.mergeObjectContext(product).commit();  // 2. despachar
+
+    return product.id.getValue();
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>El orden importa: publicar antes de guardar abre una ventana en la que un manejador lee un producto que todavía no existe. Y sin <code>.commit()</code> el comando triunfa, devuelve su respuesta, y <strong>todos tus <code>@EventsHandler</code> se saltan en silencio</strong>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Paso 6 · Comprobar que funciona</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>npx ddd validate</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Audita las cuatro reglas del idioma contra tu código y tu versión instalada. Es un comando determinista, sin modelo, y se puede poner en CI tal cual.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<div class="nl-note">
+  <p class="nl-note__title">Para seguir</p>
+  <p>La versión larga, con el ciclo de vida de un pedido y las entidades hijas, está en <a href="https://docs.nestjslatam.dev/guia/primer-agregado">Tu primer agregado</a>. Y la <a href="https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md">guía del CLI</a> construye un dominio entero comando a comando.</p>
+</div>
+<!-- /wp:html -->

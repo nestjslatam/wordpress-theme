@@ -1,0 +1,112 @@
+<!-- meta: cat=How-To | tags=Testing,DDD,Jest | resumen=Qué probar de un agregado, en qué orden, y las tres aserciones que casi nadie escribe y son las que encuentran bugs. -->
+<!-- wp:paragraph -->
+<p>Escribir pruebas para un agregado es fácil de hacer mal, porque el camino obvio —construir, comprobar que falla— cubre poco y tranquiliza mucho. Estas son las que de verdad encuentran cosas.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">1. Que recolecta, no que lanza</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>it('recolecta todas las reglas rotas, no sólo la primera', () =&gt; {
+  const product = new Product({
+    name: Name.create('Teclado Inalámbrico'),
+    description: Description.create('Corta'),   // más corta que el nombre
+    price: Price.create(49.99),
+    status: ProductStatus.ACTIVE,
+  });
+
+  expect(product.isValid).toBe(false);
+  expect(product.brokenRules.getBrokenRules()).toHaveLength(1);
+});</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Fíjate en que se usa <code>new</code> y no <code>create()</code>. La fábrica lanza; para observar la recolección hay que construir directamente. Y los value objects que se le pasan tienen que ser <strong>válidos</strong>: si le das un <code>Name.create('Ab')</code>, la excepción salta ahí y nunca llegas al agregado.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">2. Que vuelve a ser válido — la que nadie escribe</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>it('vuelve a ser válido cuando se corrige el problema', () =&gt; {
+  const product = new Product({ ...props, price: Price.create(0) });
+  expect(product.isValid).toBe(false);
+
+  product.changePrice(Price.create(49.99));
+
+  expect(product.isValid).toBe(true);                        // ← ésta
+  expect(product.brokenRules.getBrokenRules()).toHaveLength(0);
+});</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>La primera aserción pasa siempre. La <strong>tercera</strong> es la que tiene valor, y es la que encontró el peor bug de la librería: <code>validate()</code> sólo añadía reglas y nunca las limpiaba, así que un agregado que fallaba una vez no volvía a ser válido jamás.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Un test que sólo verifica el camino de fallo no distingue entre «detecta el error» y «se queda atascado en el error».</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">3. Las transiciones que NO se permiten</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>it.each([
+  ['DRAFT',     'ship'],
+  ['DRAFT',     'deliver'],
+  ['DELIVERED', 'cancel'],
+])('no permite %s → %s', (estado, accion) =&gt; {
+  const order = ordenEn(estado);
+  expect(() =&gt; order[accion]()).toThrow(InvalidStateTransitionException);
+});</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Las transiciones permitidas se prueban solas al escribir el caso feliz. Las prohibidas no las prueba nadie, y son exactamente donde vive el bug de negocio caro: el pedido que se puede cancelar después de entregado.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">4. Que los eventos se acumulan</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>it('registra el evento al confirmar', () =&gt; {
+  const order = ordenConArticulos();
+
+  order.confirm();
+
+  const eventos = order.getUncommittedEvents();
+  expect(eventos).toHaveLength(1);
+  expect(eventos[0]).toBeInstanceOf(OrderConfirmedEvent);
+});</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>El agregado <em>recolecta</em> eventos; despacharlos es cosa del handler. Probar aquí que el evento existe, y en el handler que se llama a <code>commit()</code>, cubre las dos mitades sin que ninguna prueba tenga que montar el bus entero.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">5. Que <code>load()</code> NO valida</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>it('rehidrata sin validar, para poder leer filas antiguas', () =&gt; {
+  // Una fila guardada bajo reglas anteriores, que hoy sería inválida.
+  const order = Order.load({ ...props, items: [] }, id);
+
+  expect(order).toBeDefined();     // se puede leer
+  expect(order.isValid).toBe(false); // y saber que no cumple hoy
+});</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Es contraintuitivo y es correcto. Si <code>load()</code> validara, endurecer una regla convertiría tus filas históricas en datos que no se pueden ni abrir para migrarlos.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Y una advertencia sobre la cobertura</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Cuando estas pruebas estén escritas, mira el informe <strong>sin filtros</strong>:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>npx jest --coverage --collectCoverageFrom='**/*.ts' --coverageReporters=text
+node -p "Object.keys(require('./coverage/coverage-final.json')).length"</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Si esperabas 40 ficheros y salen 26, el problema no es el porcentaje: es que catorce ni siquiera se están midiendo. Es <a href="/cuando-la-cobertura-miente/">una historia larga</a>, y le pasó a esta librería con un 98,6 % declarado sobre un 58,4 % real.</p>
+<!-- /wp:paragraph -->

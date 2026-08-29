@@ -109,6 +109,24 @@ function nestjslatam_enqueue_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'nestjslatam_enqueue_scripts' );
 
+/**
+ * Icono del navegador, si el sitio no tiene uno propio.
+ *
+ * Sin esto la pestaña muestra el globo genérico de WordPress, que es lo
+ * primero que ve alguien con veinte pestañas abiertas.
+ */
+function nestjslatam_favicon() {
+	if ( has_site_icon() ) {
+		return;
+	}
+
+	printf(
+		'<link rel="icon" href="%s" type="image/svg+xml">' . "\n",
+		esc_url( get_stylesheet_directory_uri() . '/assets/img/logo.svg' )
+	);
+}
+add_action( 'wp_head', 'nestjslatam_favicon', 5 );
+
 require_once get_stylesheet_directory() . '/inc/header.php';
 require_once get_stylesheet_directory() . '/inc/patterns.php';
 require_once get_stylesheet_directory() . '/inc/setup.php';

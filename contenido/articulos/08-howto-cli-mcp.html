@@ -1,0 +1,78 @@
+<!-- meta: cat=How-To | tags=CLI,MCP,Claude Code,Cursor | resumen=Conecta ddd-cli a Claude Code o Cursor en un comando, sin clave de API, y deja que el agente modele tu dominio con las declaraciones reales. -->
+<!-- wp:paragraph -->
+<p>Si ya trabajas con un agente —Claude Code, Codex, Cursor— ese agente tiene modelo y credenciales. <code>ddd-cli</code> no necesita los suyos: se conecta por MCP y le presta siete herramientas deterministas.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Un comando</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>claude mcp add ddd -- npx -y @nestjslatam/ddd-cli mcp</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Para cualquier otro cliente, en su <code>mcp.json</code>:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>{
+  "mcpServers": {
+    "ddd": { "command": "npx", "args": ["-y", "@nestjslatam/ddd-cli", "mcp"] }
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Las siete herramientas</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<table>
+<tr><th>Herramienta</th><th>Qué hace</th></tr>
+<tr><td><code>ddd_list</code></td><td>Inventaría cada estereotipo que exporta la librería instalada</td></tr>
+<tr><td><code>ddd_describe</code></td><td>La declaración de tipos real de un estereotipo</td></tr>
+<tr><td><code>ddd_new</code></td><td>Genera desde una plantilla determinista</td></tr>
+<tr><td><code>ddd_extend</code></td><td>Anda una subclase con todos los miembros abstractos</td></tr>
+<tr><td><code>ddd_validate</code></td><td>Comprueba el código contra las cuatro reglas del idioma</td></tr>
+<tr><td><code>ddd_aggregate_schema</code></td><td>El JSON Schema que debe cumplir el modelo de un agregado</td></tr>
+<tr><td><code>ddd_render_aggregate</code></td><td>Convierte una especificación en ficheros</td></tr>
+</table>
+<!-- /wp:html -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Un prompt que funciona</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<blockquote><p>Lee el <code>ddd-lib</code> que tengo instalado y modela un agregado <code>Cargo</code> para un dominio de transporte marítimo: un identificador de seguimiento, una especificación de ruta con origen y destino, un peso bruto y un viaje actual. Valida lo que escribas antes de enseñármelo.</p></blockquote>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>El agente llamará a <code>ddd_list</code>, <code>ddd_describe</code>, <code>ddd_aggregate_schema</code>, <code>ddd_render_aggregate</code> y <code>ddd_validate</code> en el orden que necesite.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Por qué el reparto funciona</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>El agente decide</strong> la frontera del agregado, las invariantes y los nombres. Eso es criterio, y es lo que un modelo hace bien.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>El CLI hace</strong> lo que un modelo hace mal: leer las declaraciones instaladas con exactitud, renderizar de forma determinista y auditar contra el idioma. <code>ddd_describe</code> devuelve <em>hechos, no prosa</em> a propósito — la explicación la escribe el agente.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Y hay un bucle de corrección que merece señalar: <code>ddd_aggregate_schema</code> publica el esquema que la especificación debe cumplir, y <code>ddd_render_aggregate</code> devuelve los problemas <strong>campo por campo</strong> cuando no lo cumple. Así el agente se corrige solo, sin que haya nadie mirando.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Nada toca el disco sin permiso</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Ninguna llamada escribe salvo que pase <code>write: true</code>, y <strong>aun así jamás sobrescribe un fichero existente</strong>. Un agente trabajando sin supervisión no debe pisar código de dominio escrito a mano, y ésa es una decisión del servidor, no una recomendación al usuario.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<div class="nl-note">
+  <p class="nl-note__title">Ojo con una distinción</p>
+  <p>Esto vale para el <strong>servidor MCP</strong>. Los comandos sueltos <code>ddd generate:aggregate</code> y <code>ddd explain</code> (sin <code>--raw</code>) sí necesitan un proveedor de modelo. Lo que no necesita clave es el camino MCP, porque ahí el modelo lo pone tu agente.</p>
+</div>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>La referencia completa está en <a href="https://docs.nestjslatam.dev/cli/mcp">la documentación del servidor MCP</a>, y la <a href="https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md">guía del CLI</a> lo recorre con un dominio real.</p>
+<!-- /wp:paragraph -->

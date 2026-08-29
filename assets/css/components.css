@@ -384,11 +384,14 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
 
 .nl-brand__link {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: var(--nl-space-3);
   text-decoration: none;
   padding: var(--nl-space-3) 0;
 }
+.nl-brand__mark { display: flex; flex-shrink: 0; }
+.nl-brand__mark svg { width: 34px; height: 34px; display: block; }
+.nl-brand__text { display: flex; flex-direction: column; gap: 1px; }
 .nl-brand__name {
   font-weight: var(--nl-weight-strong);
   font-size: var(--nl-text-lg);
