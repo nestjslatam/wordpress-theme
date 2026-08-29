@@ -109,5 +109,6 @@ function nestjslatam_enqueue_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'nestjslatam_enqueue_scripts' );
 
+require_once get_stylesheet_directory() . '/inc/header.php';
 require_once get_stylesheet_directory() . '/inc/patterns.php';
 require_once get_stylesheet_directory() . '/inc/setup.php';

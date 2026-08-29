@@ -379,3 +379,26 @@ input[type='search'], input[type='password'], textarea, select {
   padding: 0.7em 1em;
 }
 input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
+
+/* Marca de respaldo, cuando el Customizer no da logo ni título ------------ */
+
+.nl-brand__link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+  padding: var(--nl-space-3) 0;
+}
+.nl-brand__name {
+  font-weight: var(--nl-weight-strong);
+  font-size: var(--nl-text-lg);
+  letter-spacing: -0.02em;
+  color: var(--nl-text);
+  line-height: 1.1;
+}
+.nl-brand__tag {
+  font-size: var(--nl-text-xs);
+  color: var(--nl-text-muted);
+  line-height: 1.2;
+}
+.nl-brand__link:hover .nl-brand__name { color: var(--nl-red-soft); }
