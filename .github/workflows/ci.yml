@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sintaxis PHP
+        run: |
+          for f in functions.php inc/*.php; do
+            echo "  $f"
+            php -l "$f" > /dev/null
+          done
+
+      - name: El zip se construye y trae la carpeta raíz
+        run: |
+          ./build.sh
+          zip=$(ls dist/*.zip)
+          # WordPress rechaza un zip sin carpeta raíz, así que se comprueba.
+          unzip -l "$zip" | grep -q 'nestjslatam/style.css' \
+            || { echo "el zip no tiene la carpeta raíz esperada"; exit 1; }
+
+      - name: Ningún color a pelo fuera de tokens.css
+        run: |
+          # Un hex suelto en un componente rompe el modo oscuro sin avisar.
+          if grep -rnE '#[0-9a-fA-F]{3,8}\b' assets/css --include='*.css' \
+               | grep -v '^assets/css/tokens.css:'; then
+            echo
+            echo "Usa una variable de tokens.css en vez de un color literal."
+            exit 1
+          fi

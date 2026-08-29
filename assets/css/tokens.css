@@ -1,0 +1,115 @@
+/* Tokens de diseño. Todo lo demás se define en función de esto, así que un
+   cambio de identidad se hace aquí y en ningún otro sitio. */
+
+:root {
+  /* Marca */
+  --nl-blue:        #1e73be;
+  --nl-blue-dark:   #14548c;
+  --nl-blue-light:  #4a97d9;
+  --nl-green:       #00d084;
+  --nl-green-dark:  #00a468;
+
+  /* Superficies */
+  --nl-bg:          #ffffff;
+  --nl-bg-subtle:   #f7f9fb;
+  --nl-bg-sunken:   #eef2f6;
+  --nl-border:      #dfe6ed;
+  --nl-border-soft: #edf1f5;
+
+  /* Texto */
+  --nl-text:        #16212e;
+  --nl-text-muted:  #5b6b7c;
+  --nl-text-faint:  #8697a8;
+  --nl-text-invert: #ffffff;
+
+  /* Código */
+  --nl-code-bg:     #0f1b28;
+  --nl-code-text:   #e3ecf4;
+  --nl-code-inline-bg:   #eef2f6;
+  --nl-code-inline-text: #14548c;
+
+  /* Superpuestos sobre el fondo oscuro de los bloques de código. No cambian
+     con el tema: `pre` es oscuro siempre, también en modo claro. */
+  --nl-on-code:          #cfdcea;
+  --nl-on-code-strong:   #ffffff;
+  --nl-code-overlay:        rgba(255, 255, 255, .08);
+  --nl-code-overlay-hover:  rgba(255, 255, 255, .16);
+  --nl-code-overlay-border: rgba(255, 255, 255, .18);
+
+  /* Estados */
+  --nl-warn:   #b8860b;
+  --nl-danger: #c53030;
+
+  /* Tipografía */
+  --nl-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+             'Helvetica Neue', Arial, sans-serif;
+  --nl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
+                  Consolas, monospace;
+
+  /* Escala — proporción 1.25, redondeada a valores legibles */
+  --nl-text-xs:   0.8125rem;
+  --nl-text-sm:   0.9375rem;
+  --nl-text-base: 1.0625rem;
+  --nl-text-lg:   1.1875rem;
+  --nl-text-xl:   1.5rem;
+  --nl-text-2xl:  1.9375rem;
+  --nl-text-3xl:  2.5rem;
+  --nl-text-4xl:  3.25rem;
+
+  /* Ritmo */
+  --nl-space-1: 0.25rem;
+  --nl-space-2: 0.5rem;
+  --nl-space-3: 0.75rem;
+  --nl-space-4: 1rem;
+  --nl-space-6: 1.5rem;
+  --nl-space-8: 2rem;
+  --nl-space-12: 3rem;
+  --nl-space-16: 4rem;
+  --nl-space-24: 6rem;
+
+  /* Forma */
+  --nl-radius:    10px;
+  --nl-radius-lg: 16px;
+  --nl-radius-full: 999px;
+
+  --nl-shadow-sm: 0 1px 2px rgba(22, 33, 46, .06);
+  --nl-shadow:    0 4px 16px rgba(22, 33, 46, .08);
+  --nl-shadow-lg: 0 12px 40px rgba(22, 33, 46, .12);
+
+  --nl-transition: 160ms cubic-bezier(.4, 0, .2, 1);
+
+  /* Medida — el ancho de línea cómodo para leer prosa */
+  --nl-measure: 46rem;
+}
+
+/* El modo oscuro sigue la preferencia del sistema. Cada token se redefine;
+   ninguno se queda con su valor claro, porque un solo token sin redefinir
+   produce texto invisible en vez de un contraste algo peor. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-nl-theme='light']) {
+    --nl-bg:          #0d1620;
+    --nl-bg-subtle:   #121e2b;
+    --nl-bg-sunken:   #182635;
+    --nl-border:      #24374a;
+    --nl-border-soft: #1c2c3d;
+
+    --nl-text:        #e6edf4;
+    --nl-text-muted:  #a3b3c4;
+    --nl-text-faint:  #73879b;
+
+    --nl-blue:        #62a8e5;
+    --nl-blue-dark:   #8fc3ef;
+    --nl-blue-light:  #3d8bd4;
+
+    --nl-code-bg:     #08111a;
+    --nl-code-inline-bg:   #182635;
+    --nl-code-inline-text: #8fc3ef;
+
+    --nl-warn:   #e0a92b;
+    --nl-danger: #f07171;
+
+    --nl-shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+    --nl-shadow:    0 4px 16px rgba(0, 0, 0, .5);
+    --nl-shadow-lg: 0 12px 40px rgba(0, 0, 0, .6);
+  }
+}

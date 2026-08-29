@@ -1,0 +1,170 @@
+/* Tipografía y elementos de documento. */
+
+body {
+  font-family: var(--nl-font);
+  font-size: var(--nl-text-base);
+  line-height: 1.7;
+  color: var(--nl-text);
+  background: var(--nl-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--nl-font);
+  color: var(--nl-text);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.22;
+  margin-top: var(--nl-space-12);
+  margin-bottom: var(--nl-space-4);
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--nl-text-3xl); font-weight: 800; letter-spacing: -0.03em; margin-top: 0; }
+h2 { font-size: var(--nl-text-2xl); }
+h3 { font-size: var(--nl-text-xl); }
+h4 { font-size: var(--nl-text-lg); }
+
+/* Un separador sutil bajo los h2 marca las secciones sin añadir una regla
+   horizontal explícita en cada entrada. */
+.entry-content h2 {
+  padding-bottom: var(--nl-space-3);
+  border-bottom: 1px solid var(--nl-border-soft);
+}
+
+p { margin: 0 0 var(--nl-space-6); }
+
+.entry-content > p,
+.entry-content > ul,
+.entry-content > ol,
+.entry-content > blockquote {
+  max-width: var(--nl-measure);
+}
+
+a {
+  color: var(--nl-blue);
+  text-decoration-color: color-mix(in srgb, var(--nl-blue) 35%, transparent);
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  transition: color var(--nl-transition), text-decoration-color var(--nl-transition);
+}
+a:hover {
+  color: var(--nl-blue-dark);
+  text-decoration-color: currentColor;
+}
+
+/* El foco visible no es opcional: es cómo navega quien usa teclado. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--nl-blue);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+strong { font-weight: 650; color: var(--nl-text); }
+
+ul, ol { padding-left: 1.4em; margin: 0 0 var(--nl-space-6); }
+li { margin-bottom: var(--nl-space-2); }
+li::marker { color: var(--nl-text-faint); }
+
+blockquote {
+  margin: var(--nl-space-8) 0;
+  padding: var(--nl-space-4) var(--nl-space-6);
+  border-left: 3px solid var(--nl-blue);
+  background: var(--nl-bg-subtle);
+  border-radius: 0 var(--nl-radius) var(--nl-radius) 0;
+  color: var(--nl-text-muted);
+  font-style: normal;
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--nl-border);
+  margin: var(--nl-space-16) 0;
+}
+
+img, video { max-width: 100%; height: auto; border-radius: var(--nl-radius); }
+
+/* Código ------------------------------------------------------------------ */
+
+code, kbd, samp {
+  font-family: var(--nl-font-mono);
+  font-size: 0.885em;
+  font-variant-ligatures: none;
+}
+
+:not(pre) > code {
+  background: var(--nl-code-inline-bg);
+  color: var(--nl-code-inline-text);
+  padding: 0.15em 0.42em;
+  border-radius: 5px;
+  border: 1px solid var(--nl-border-soft);
+  white-space: nowrap;
+}
+
+pre {
+  background: var(--nl-code-bg);
+  color: var(--nl-code-text);
+  padding: var(--nl-space-6);
+  border-radius: var(--nl-radius);
+  overflow-x: auto;          /* el bloque hace scroll, la página nunca */
+  font-family: var(--nl-font-mono);
+  font-size: var(--nl-text-sm);
+  line-height: 1.65;
+  margin: var(--nl-space-8) 0;
+  box-shadow: var(--nl-shadow);
+  -webkit-overflow-scrolling: touch;
+}
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  white-space: pre;
+}
+
+/* Tablas ------------------------------------------------------------------ */
+
+.entry-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--nl-space-8) 0;
+  font-size: var(--nl-text-sm);
+  display: block;
+  overflow-x: auto;          /* igual que pre: la tabla scrollea, no el body */
+  white-space: nowrap;
+}
+@media (min-width: 768px) {
+  .entry-content table { display: table; white-space: normal; }
+}
+
+.entry-content th {
+  text-align: left;
+  font-weight: 650;
+  padding: var(--nl-space-3) var(--nl-space-4);
+  border-bottom: 2px solid var(--nl-border);
+  color: var(--nl-text);
+}
+.entry-content td {
+  padding: var(--nl-space-3) var(--nl-space-4);
+  border-bottom: 1px solid var(--nl-border-soft);
+  vertical-align: top;
+}
+.entry-content tbody tr:hover { background: var(--nl-bg-subtle); }
+
+/* Quien haya pedido menos movimiento, que tenga menos movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

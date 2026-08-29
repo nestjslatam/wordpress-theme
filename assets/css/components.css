@@ -1,0 +1,269 @@
+/* Piezas reutilizables: cabecera, navegación, botones, tarjetas, pie. */
+
+/* Cabecera --------------------------------------------------------------- */
+
+.site-header {
+  background: var(--nl-bg);
+  border-bottom: 1px solid var(--nl-border);
+  backdrop-filter: saturate(180%) blur(12px);
+}
+
+.main-navigation {
+  background: transparent;
+}
+.main-navigation .main-nav ul li a {
+  font-weight: 500;
+  font-size: var(--nl-text-sm);
+  color: var(--nl-text-muted);
+  transition: color var(--nl-transition);
+}
+.main-navigation .main-nav ul li a:hover,
+.main-navigation .main-nav ul li.current-menu-item > a {
+  color: var(--nl-blue);
+  background: transparent;
+}
+
+/* Subrayado que crece desde el centro al pasar por encima. */
+.main-navigation .main-nav ul li > a {
+  position: relative;
+}
+.main-navigation .main-nav ul li > a::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 12px;
+  height: 2px;
+  background: var(--nl-blue);
+  border-radius: 2px;
+  transition: left var(--nl-transition), right var(--nl-transition);
+}
+.main-navigation .main-nav ul li > a:hover::after,
+.main-navigation .main-nav ul li.current-menu-item > a::after {
+  left: 20px;
+  right: 20px;
+}
+
+/* Botones ---------------------------------------------------------------- */
+
+.wp-block-button__link,
+button:not(.nl-copy),
+input[type='submit'],
+.button {
+  font-family: var(--nl-font);
+  font-weight: 600;
+  font-size: var(--nl-text-sm);
+  padding: 0.7em 1.5em;
+  border-radius: var(--nl-radius);
+  border: 0;
+  background: var(--nl-blue);
+  color: var(--nl-text-invert);
+  box-shadow: var(--nl-shadow-sm);
+  transition: background var(--nl-transition), transform var(--nl-transition),
+              box-shadow var(--nl-transition);
+  cursor: pointer;
+}
+.wp-block-button__link:hover,
+button:not(.nl-copy):hover,
+input[type='submit']:hover,
+.button:hover {
+  background: var(--nl-blue-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--nl-shadow);
+  color: var(--nl-text-invert);
+}
+.wp-block-button__link:active,
+button:not(.nl-copy):active { transform: translateY(0); }
+
+.wp-block-button.is-style-outline .wp-block-button__link {
+  background: transparent;
+  color: var(--nl-blue);
+  border: 1.5px solid var(--nl-blue);
+  box-shadow: none;
+}
+.wp-block-button.is-style-outline .wp-block-button__link:hover {
+  background: var(--nl-blue);
+  color: var(--nl-text-invert);
+}
+
+/* Héroe ------------------------------------------------------------------ */
+
+.nl-hero {
+  padding: var(--nl-space-24) var(--nl-space-6);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% -10%,
+      color-mix(in srgb, var(--nl-blue) 14%, transparent), transparent),
+    var(--nl-bg-subtle);
+  border-bottom: 1px solid var(--nl-border);
+}
+
+.nl-hero__eyebrow {
+  display: inline-block;
+  font-size: var(--nl-text-xs);
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nl-blue);
+  background: color-mix(in srgb, var(--nl-blue) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--nl-blue) 25%, transparent);
+  padding: 0.35em 1em;
+  border-radius: var(--nl-radius-full);
+  margin-bottom: var(--nl-space-6);
+}
+
+.nl-hero__title {
+  font-size: clamp(2.25rem, 6vw, var(--nl-text-4xl));
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  margin: 0 0 var(--nl-space-6);
+  text-wrap: balance;
+}
+.nl-hero__title em {
+  font-style: normal;
+  background: linear-gradient(120deg, var(--nl-blue), var(--nl-green));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nl-hero__lead {
+  font-size: var(--nl-text-lg);
+  color: var(--nl-text-muted);
+  max-width: 40rem;
+  margin: 0 auto var(--nl-space-8);
+  text-wrap: pretty;
+}
+
+.nl-hero__actions {
+  display: flex;
+  gap: var(--nl-space-4);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Tarjetas --------------------------------------------------------------- */
+
+.nl-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--nl-space-6);
+  margin: var(--nl-space-12) 0;
+}
+
+.nl-card {
+  background: var(--nl-bg);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius-lg);
+  padding: var(--nl-space-6);
+  transition: transform var(--nl-transition), box-shadow var(--nl-transition),
+              border-color var(--nl-transition);
+  display: flex;
+  flex-direction: column;
+}
+.nl-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--nl-shadow-lg);
+  border-color: color-mix(in srgb, var(--nl-blue) 40%, var(--nl-border));
+}
+
+.nl-card__icon { font-size: 1.75rem; line-height: 1; margin-bottom: var(--nl-space-4); }
+
+.nl-card__title {
+  font-size: var(--nl-text-lg);
+  font-weight: 700;
+  margin: 0 0 var(--nl-space-2);
+}
+.nl-card__title a { color: var(--nl-text); text-decoration: none; }
+.nl-card__title a:hover { color: var(--nl-blue); }
+
+.nl-card__body {
+  color: var(--nl-text-muted);
+  font-size: var(--nl-text-sm);
+  margin: 0 0 var(--nl-space-4);
+  flex: 1;
+}
+
+.nl-card__cta {
+  font-size: var(--nl-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+.nl-card__cta::after {
+  content: ' →';
+  transition: margin var(--nl-transition);
+}
+.nl-card:hover .nl-card__cta::after { margin-left: 3px; }
+
+/* Avisos ----------------------------------------------------------------- */
+
+.nl-note {
+  border-radius: var(--nl-radius);
+  padding: var(--nl-space-4) var(--nl-space-6);
+  margin: var(--nl-space-8) 0;
+  border-left: 4px solid var(--nl-blue);
+  background: color-mix(in srgb, var(--nl-blue) 7%, var(--nl-bg));
+  font-size: var(--nl-text-sm);
+}
+.nl-note--warn {
+  border-left-color: var(--nl-warn);
+  background: color-mix(in srgb, var(--nl-warn) 8%, var(--nl-bg));
+}
+.nl-note--danger {
+  border-left-color: var(--nl-danger);
+  background: color-mix(in srgb, var(--nl-danger) 8%, var(--nl-bg));
+}
+.nl-note__title {
+  font-weight: 700;
+  margin: 0 0 var(--nl-space-2);
+  font-size: var(--nl-text-sm);
+}
+.nl-note p:last-child { margin-bottom: 0; }
+
+/* Botón de copiar en los bloques de código -------------------------------- */
+
+.nl-pre-wrap { position: relative; }
+
+.nl-copy {
+  position: absolute;
+  top: var(--nl-space-3);
+  right: var(--nl-space-3);
+  font-family: var(--nl-font);
+  font-size: var(--nl-text-xs);
+  font-weight: 600;
+  padding: 0.35em 0.8em;
+  border-radius: 6px;
+  border: 1px solid var(--nl-code-overlay-border);
+  background: var(--nl-code-overlay);
+  color: var(--nl-on-code);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--nl-transition), background var(--nl-transition);
+}
+.nl-pre-wrap:hover .nl-copy,
+.nl-copy:focus-visible { opacity: 1; }
+.nl-copy:hover { background: var(--nl-code-overlay-hover); color: var(--nl-on-code-strong); }
+.nl-copy[data-state='done'] {
+  opacity: 1;
+  color: var(--nl-green);
+  border-color: color-mix(in srgb, var(--nl-green) 45%, transparent);
+}
+
+/* En pantallas táctiles no hay hover, así que el botón se queda visible. */
+@media (hover: none) {
+  .nl-copy { opacity: 1; }
+}
+
+/* Pie -------------------------------------------------------------------- */
+
+.site-footer {
+  background: var(--nl-bg-subtle);
+  border-top: 1px solid var(--nl-border);
+  color: var(--nl-text-muted);
+  font-size: var(--nl-text-sm);
+}
+.site-footer a { color: var(--nl-text-muted); }
+.site-footer a:hover { color: var(--nl-blue); }

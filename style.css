@@ -1,0 +1,19 @@
+/*
+Theme Name:   NestJS Latam
+Theme URI:    https://github.com/nestjslatam/wordpress-theme
+Description:  Tema hijo de GeneratePress para nestjslatam.dev. La identidad
+              visual de la comunidad: tipografía, paleta, tarjetas y bloques
+              de código. Se versiona en git y se despliega como zip.
+Author:       NestJS Latam
+Author URI:   https://nestjslatam.dev
+Template:     generatepress
+Version:      1.0.0
+License:      MIT
+License URI:  https://opensource.org/licenses/MIT
+Text Domain:  nestjslatam
+Tags:         blog, documentation, community
+*/
+
+/* Los estilos viven en assets/css/, que functions.php encola en orden.
+   Este fichero sólo lleva la cabecera que WordPress necesita para
+   reconocer el tema, para que un cambio de estilos no toque metadatos. */

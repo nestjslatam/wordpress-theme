@@ -1,0 +1,128 @@
+/* Listado y entrada individual. */
+
+.nl-posts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: var(--nl-space-8);
+}
+
+.blog .site-main article,
+.archive .site-main article {
+  background: var(--nl-bg);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius-lg);
+  overflow: hidden;
+  transition: transform var(--nl-transition), box-shadow var(--nl-transition),
+              border-color var(--nl-transition);
+  margin-bottom: var(--nl-space-8);
+}
+.blog .site-main article:hover,
+.archive .site-main article:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--nl-shadow-lg);
+  border-color: color-mix(in srgb, var(--nl-blue) 35%, var(--nl-border));
+}
+
+.blog .site-main article .post-image img,
+.archive .site-main article .post-image img {
+  border-radius: 0;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.entry-title { letter-spacing: -0.026em; }
+.blog .entry-title,
+.archive .entry-title { font-size: var(--nl-text-xl); margin-top: 0; }
+.blog .entry-title a,
+.archive .entry-title a { color: var(--nl-text); text-decoration: none; }
+.blog .entry-title a:hover,
+.archive .entry-title a:hover { color: var(--nl-blue); }
+
+.entry-meta {
+  font-size: var(--nl-text-xs);
+  color: var(--nl-text-faint);
+  text-transform: none;
+}
+.entry-meta a { color: var(--nl-text-faint); }
+.entry-meta a:hover { color: var(--nl-blue); }
+
+/* Categorías como etiquetas. */
+.entry-meta .cat-links a,
+.entry-meta .tags-links a {
+  display: inline-block;
+  font-size: var(--nl-text-xs);
+  font-weight: 600;
+  padding: 0.2em 0.7em;
+  border-radius: var(--nl-radius-full);
+  background: color-mix(in srgb, var(--nl-blue) 10%, transparent);
+  color: var(--nl-blue);
+  text-decoration: none;
+  margin-right: var(--nl-space-2);
+  transition: background var(--nl-transition);
+}
+.entry-meta .cat-links a:hover,
+.entry-meta .tags-links a:hover {
+  background: color-mix(in srgb, var(--nl-blue) 20%, transparent);
+}
+
+/* Entrada individual ------------------------------------------------------ */
+
+.single .entry-header { margin-bottom: var(--nl-space-8); }
+.single .entry-title { font-size: clamp(2rem, 5vw, var(--nl-text-3xl)); }
+
+/* El primer párrafo hace de entradilla. */
+.single .entry-content > p:first-of-type {
+  font-size: var(--nl-text-lg);
+  color: var(--nl-text-muted);
+  line-height: 1.65;
+}
+
+/* Barra de progreso de lectura. La pinta copy-code.js. */
+.nl-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: linear-gradient(90deg, var(--nl-blue), var(--nl-green));
+  z-index: 9999;
+  transition: width 80ms linear;
+}
+
+/* Índice de contenidos, si el tema padre lo genera. */
+.nl-toc {
+  background: var(--nl-bg-subtle);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius);
+  padding: var(--nl-space-6);
+  margin-bottom: var(--nl-space-8);
+  font-size: var(--nl-text-sm);
+}
+.nl-toc__title {
+  font-weight: 700;
+  font-size: var(--nl-text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nl-text-faint);
+  margin: 0 0 var(--nl-space-3);
+}
+.nl-toc ul { list-style: none; padding: 0; margin: 0; }
+.nl-toc li { margin-bottom: var(--nl-space-2); }
+.nl-toc a { text-decoration: none; color: var(--nl-text-muted); }
+.nl-toc a:hover { color: var(--nl-blue); }
+
+/* Paginación -------------------------------------------------------------- */
+
+.paging-navigation .nav-links > * {
+  border-radius: var(--nl-radius);
+  padding: 0.5em 0.95em;
+  border: 1px solid var(--nl-border);
+  text-decoration: none;
+  transition: all var(--nl-transition);
+}
+.paging-navigation .nav-links .current {
+  background: var(--nl-blue);
+  color: var(--nl-text-invert);
+  border-color: var(--nl-blue);
+}
