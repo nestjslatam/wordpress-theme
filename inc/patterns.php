@@ -31,8 +31,8 @@ function nestjslatam_register_patterns() {
   <h1 class="nl-hero__title">Domain-Driven Design para <em>NestJS</em></h1>
   <p class="nl-hero__lead">Librerías, artículos y herramientas en español. Todo en npm, todo MIT, todo con el código a la vista.</p>
   <div class="nl-hero__actions">
-    <a class="wp-block-button__link" href="https://docs.nestjslatam.dev">Leer la documentación</a>
-    <a class="wp-block-button__link is-style-outline" href="https://github.com/nestjslatam">Ver en GitHub</a>
+    <a class="nl-btn" href="https://docs.nestjslatam.dev">Leer la documentación</a>
+    <a class="nl-btn nl-btn--ghost" href="https://github.com/nestjslatam">Ver en GitHub</a>
   </div>
 </section>
 <!-- /wp:html -->',

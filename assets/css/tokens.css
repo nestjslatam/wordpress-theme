@@ -1,62 +1,74 @@
-/* Tokens de diseño. Todo lo demás se define en función de esto, así que un
-   cambio de identidad se hace aquí y en ningún otro sitio. */
+/* Tokens de diseño, siguiendo el lenguaje visual de nestjs.com.
+   Medido del sitio real, no de memoria:
+     fondo #050303 · texto #fff · apagado #9b9a9a · acento #ea2845
+     Manrope · titulares de peso 500 · botones blancos con texto negro y r=20px
+
+   El sitio de referencia es oscuro y no tiene modo claro. Éste tampoco: un
+   modo claro a medias fue justo el fallo de la versión anterior, y mantener
+   dos paletas coherentes cuesta más de lo que aporta aquí. */
 
 :root {
   /* Marca */
-  --nl-blue:        #1e73be;
-  --nl-blue-dark:   #14548c;
-  --nl-blue-light:  #4a97d9;
-  --nl-green:       #00d084;
-  --nl-green-dark:  #00a468;
+  --nl-red:        #ea2845;
+  --nl-red-soft:   #ff5c74;
+  --nl-red-deep:   #c11a33;
 
-  /* Superficies */
-  --nl-bg:          #ffffff;
-  --nl-bg-subtle:   #f7f9fb;
-  --nl-bg-sunken:   #eef2f6;
-  --nl-border:      #dfe6ed;
-  --nl-border-soft: #edf1f5;
+  /* Superficies. El negro no es puro: lleva un punto cálido, como el original. */
+  --nl-bg:          #050303;
+  --nl-bg-subtle:   rgba(255, 255, 255, .04);
+  --nl-bg-sunken:   rgba(255, 255, 255, .07);
+  --nl-bg-solid:    #0e0a0b;   /* cuando hace falta opacidad real */
+  --nl-border:      rgba(255, 255, 255, .12);
+  --nl-border-soft: rgba(255, 255, 255, .07);
 
   /* Texto */
-  --nl-text:        #16212e;
-  --nl-text-muted:  #5b6b7c;
-  --nl-text-faint:  #8697a8;
-  --nl-text-invert: #ffffff;
+  --nl-text:        #ffffff;
+  --nl-text-muted:  #9b9a9a;
+  --nl-text-faint:  rgba(255, 255, 255, .45);
+  --nl-text-invert: #000000;
 
-  /* Código */
-  --nl-code-bg:     #0f1b28;
-  --nl-code-text:   #e3ecf4;
-  --nl-code-inline-bg:   #eef2f6;
-  --nl-code-inline-text: #14548c;
+  /* Código — los tonos de resaltado son los del tema oscuro de GitHub, que es
+     lo que usa la referencia. */
+  --nl-code-bg:          rgba(255, 255, 255, .05);
+  --nl-code-text:        #e6edf3;
+  --nl-code-border:      rgba(255, 255, 255, .1);
+  --nl-code-inline-bg:   rgba(255, 255, 255, .08);
+  --nl-code-inline-text: #ffa657;
+  --nl-syntax-string:    #a5d6ff;
+  --nl-syntax-keyword:   #ff7b72;
+  --nl-syntax-comment:   #8b949e;
 
-  /* Superpuestos sobre el fondo oscuro de los bloques de código. No cambian
-     con el tema: `pre` es oscuro siempre, también en modo claro. */
-  --nl-on-code:          #cfdcea;
-  --nl-on-code-strong:   #ffffff;
+  --nl-on-code:            rgba(255, 255, 255, .6);
+  --nl-on-code-strong:     #ffffff;
   --nl-code-overlay:        rgba(255, 255, 255, .08);
   --nl-code-overlay-hover:  rgba(255, 255, 255, .16);
   --nl-code-overlay-border: rgba(255, 255, 255, .18);
 
   /* Estados */
-  --nl-warn:   #b8860b;
-  --nl-danger: #c53030;
+  --nl-warn:   #ffa657;
+  --nl-danger: #ff7b72;
+  --nl-ok:     #3fb950;
 
   /* Tipografía */
-  --nl-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  --nl-font: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
              'Helvetica Neue', Arial, sans-serif;
   --nl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
                   Consolas, monospace;
 
-  /* Escala — proporción 1.25, redondeada a valores legibles */
+  /* Pesos. La referencia titula con 500, no con 800: el titular manda por
+     tamaño y por aire, no por grosor. */
+  --nl-weight-title: 500;
+  --nl-weight-strong: 700;
+
   --nl-text-xs:   0.8125rem;
   --nl-text-sm:   0.9375rem;
-  --nl-text-base: 1.0625rem;
+  --nl-text-base: 1rem;
   --nl-text-lg:   1.1875rem;
   --nl-text-xl:   1.5rem;
-  --nl-text-2xl:  1.9375rem;
-  --nl-text-3xl:  2.5rem;
-  --nl-text-4xl:  3.25rem;
+  --nl-text-2xl:  2rem;
+  --nl-text-3xl:  3rem;
+  --nl-text-4xl:  4rem;
 
-  /* Ritmo */
   --nl-space-1: 0.25rem;
   --nl-space-2: 0.5rem;
   --nl-space-3: 0.75rem;
@@ -67,70 +79,34 @@
   --nl-space-16: 4rem;
   --nl-space-24: 6rem;
 
-  /* Forma */
-  --nl-radius:    10px;
-  --nl-radius-lg: 16px;
+  /* Forma. El radio grande de los botones (20px) es una firma del original. */
+  --nl-radius:      12px;
+  --nl-radius-lg:   20px;
+  --nl-radius-btn:  20px;
   --nl-radius-full: 999px;
 
-  --nl-shadow-sm: 0 1px 2px rgba(22, 33, 46, .06);
-  --nl-shadow:    0 4px 16px rgba(22, 33, 46, .08);
-  --nl-shadow-lg: 0 12px 40px rgba(22, 33, 46, .12);
+  --nl-shadow-sm: 0 1px 2px rgba(0, 0, 0, .5);
+  --nl-shadow:    0 8px 30px rgba(0, 0, 0, .6);
+  --nl-shadow-lg: 0 20px 60px rgba(0, 0, 0, .7);
+  --nl-glow-red:  0 0 60px color-mix(in srgb, var(--nl-red) 30%, transparent);
 
-  --nl-transition: 160ms cubic-bezier(.4, 0, .2, 1);
+  --nl-transition: 180ms cubic-bezier(.4, 0, .2, 1);
+  --nl-measure: 44rem;
 
-  /* Medida — el ancho de línea cómodo para leer prosa */
-  --nl-measure: 46rem;
-}
+  /* GeneratePress se pinta ENTERO con estas siete variables, que salen del
+     Customizer como CSS en línea. Se remapean aquí, en :root y no dentro de
+     una media query, porque ahora el tema es oscuro siempre: la cabecera, la
+     barra lateral, el pie y el buscador siguen a la paleta sin que haya que
+     perseguir un selector detrás de otro. */
+  --contrast:   var(--nl-text);
+  --contrast-2: var(--nl-text-muted);
+  --contrast-3: var(--nl-text-faint);
+  --base:       var(--nl-bg-sunken);
+  --base-2:     var(--nl-bg);
+  --base-3:     var(--nl-bg-solid);
+  --accent:     var(--nl-red);
 
-/* El modo oscuro sigue la preferencia del sistema. Cada token se redefine;
-   ninguno se queda con su valor claro, porque un solo token sin redefinir
-   produce texto invisible en vez de un contraste algo peor. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-nl-theme='light']) {
-    --nl-bg:          #0d1620;
-    --nl-bg-subtle:   #121e2b;
-    --nl-bg-sunken:   #182635;
-    --nl-border:      #24374a;
-    --nl-border-soft: #1c2c3d;
-
-    --nl-text:        #e6edf4;
-    --nl-text-muted:  #a3b3c4;
-    --nl-text-faint:  #73879b;
-
-    --nl-blue:        #62a8e5;
-    --nl-blue-dark:   #8fc3ef;
-    --nl-blue-light:  #3d8bd4;
-
-    --nl-code-bg:     #08111a;
-    --nl-code-inline-bg:   #182635;
-    --nl-code-inline-text: #8fc3ef;
-
-    --nl-warn:   #e0a92b;
-    --nl-danger: #f07171;
-
-    --nl-shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
-    --nl-shadow:    0 4px 16px rgba(0, 0, 0, .5);
-    --nl-shadow-lg: 0 12px 40px rgba(0, 0, 0, .6);
-
-    /* GeneratePress se pinta ENTERO con estas siete variables, que salen del
-       Customizer y llegan como CSS en línea. Sin remapearlas aquí, el padre
-       sigue pintando las tarjetas de blanco mientras nosotros aclaramos el
-       texto: texto claro sobre tarjeta blanca, ilegible.
-       Remapeándolas, la cabecera, la barra lateral, el pie y el buscador van
-       en oscuro de forma coherente sin perseguir un selector detrás de otro.
-
-       La especificidad de `:root:not(...)` gana a la de `:root` del padre,
-       así que el orden de carga no decide el resultado. */
-    --contrast:   var(--nl-text);
-    --contrast-2: var(--nl-text-muted);
-    --contrast-3: var(--nl-text-faint);
-    --base:       var(--nl-bg-sunken);
-    --base-2:     var(--nl-bg);        /* fondo de página */
-    --base-3:     var(--nl-bg-subtle); /* tarjetas: un punto por encima */
-    --accent:     var(--nl-blue);
-
-    --gp-search-modal-bg-color:         var(--nl-bg-subtle);
-    --gp-search-modal-text-color:       var(--nl-text);
-    --gp-search-modal-overlay-bg-color: rgba(0, 0, 0, .6);
-  }
+  --gp-search-modal-bg-color:         var(--nl-bg-solid);
+  --gp-search-modal-text-color:       var(--nl-text);
+  --gp-search-modal-overlay-bg-color: rgba(0, 0, 0, .75);
 }

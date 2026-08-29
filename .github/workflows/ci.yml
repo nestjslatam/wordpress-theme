@@ -35,3 +35,12 @@ jobs:
             echo "Usa una variable de tokens.css en vez de un color literal."
             exit 1
           fi
+
+      - name: La versión no está escrita a mano en functions.php
+        run: |
+          # Un ?ver= congelado deja a los visitantes con CSS viejo durante
+          # max-age sin que nada lo delate. Ya pasó una vez.
+          if grep -qE "define\(\s*'NESTJSLATAM_VERSION',\s*'[0-9]" functions.php; then
+            echo "NESTJSLATAM_VERSION está escrita a mano; léela de style.css."
+            exit 1
+          fi

@@ -11,8 +11,8 @@
   /* var(--base-3) es la superficie de tarjeta del padre; seguirla en vez de
      imponer la nuestra respeta lo que el usuario haya puesto en el
      Customizer, y en oscuro ya viene remapeada desde tokens.css. */
-  background: var(--base-3, var(--nl-bg));
-  border: 1px solid var(--nl-border);
+  background: var(--nl-bg-subtle);
+  border: 1px solid var(--nl-border-soft);
   border-radius: var(--nl-radius-lg);
   overflow: hidden;
   transition: transform var(--nl-transition), box-shadow var(--nl-transition),
@@ -21,9 +21,9 @@
 }
 .blog .site-main article:hover,
 .archive .site-main article:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--nl-shadow-lg);
-  border-color: color-mix(in srgb, var(--nl-blue) 35%, var(--nl-border));
+  transform: translateY(-2px);
+  background: var(--nl-bg-sunken);
+  border-color: var(--nl-border);
 }
 
 .blog .site-main article .post-image img,
@@ -40,7 +40,7 @@
 .blog .entry-title a,
 .archive .entry-title a { color: var(--nl-text); text-decoration: none; }
 .blog .entry-title a:hover,
-.archive .entry-title a:hover { color: var(--nl-blue); }
+.archive .entry-title a:hover { color: var(--nl-red-soft); }
 
 .entry-meta {
   font-size: var(--nl-text-xs);
@@ -48,7 +48,7 @@
   text-transform: none;
 }
 .entry-meta a { color: var(--nl-text-faint); }
-.entry-meta a:hover { color: var(--nl-blue); }
+.entry-meta a:hover { color: var(--nl-red-soft); }
 
 /* Categorías como etiquetas. */
 .entry-meta .cat-links a,
@@ -58,15 +58,15 @@
   font-weight: 600;
   padding: 0.2em 0.7em;
   border-radius: var(--nl-radius-full);
-  background: color-mix(in srgb, var(--nl-blue) 10%, transparent);
-  color: var(--nl-blue);
+  background: color-mix(in srgb, var(--nl-red) 16%, transparent);
+  color: var(--nl-red-soft);
   text-decoration: none;
   margin-right: var(--nl-space-2);
   transition: background var(--nl-transition);
 }
 .entry-meta .cat-links a:hover,
 .entry-meta .tags-links a:hover {
-  background: color-mix(in srgb, var(--nl-blue) 20%, transparent);
+  background: color-mix(in srgb, var(--nl-red) 28%, transparent);
 }
 
 /* Entrada individual ------------------------------------------------------ */
@@ -88,7 +88,7 @@
   left: 0;
   height: 3px;
   width: 0;
-  background: linear-gradient(90deg, var(--nl-blue), var(--nl-green));
+  background: linear-gradient(90deg, var(--nl-red), var(--nl-red-soft));
   z-index: 9999;
   transition: width 80ms linear;
 }
@@ -96,7 +96,7 @@
 /* Índice de contenidos, si el tema padre lo genera. */
 .nl-toc {
   background: var(--nl-bg-subtle);
-  border: 1px solid var(--nl-border);
+  border: 1px solid var(--nl-border-soft);
   border-radius: var(--nl-radius);
   padding: var(--nl-space-6);
   margin-bottom: var(--nl-space-8);
@@ -113,7 +113,7 @@
 .nl-toc ul { list-style: none; padding: 0; margin: 0; }
 .nl-toc li { margin-bottom: var(--nl-space-2); }
 .nl-toc a { text-decoration: none; color: var(--nl-text-muted); }
-.nl-toc a:hover { color: var(--nl-blue); }
+.nl-toc a:hover { color: var(--nl-red-soft); }
 
 /* Paginación -------------------------------------------------------------- */
 
@@ -125,7 +125,7 @@
   transition: all var(--nl-transition);
 }
 .paging-navigation .nav-links .current {
-  background: var(--nl-blue);
+  background: var(--nl-text);
   color: var(--nl-text-invert);
-  border-color: var(--nl-blue);
+  border-color: var(--nl-text);
 }

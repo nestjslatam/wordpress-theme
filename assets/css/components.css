@@ -3,14 +3,15 @@
 /* Cabecera --------------------------------------------------------------- */
 
 .site-header {
-  background: var(--nl-bg);
-  border-bottom: 1px solid var(--nl-border);
-  backdrop-filter: saturate(180%) blur(12px);
+  background: color-mix(in srgb, var(--nl-bg) 80%, transparent);
+  border-bottom: 1px solid var(--nl-border-soft);
+  backdrop-filter: saturate(180%) blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.main-navigation {
-  background: transparent;
-}
+.main-navigation { background: transparent; }
 .main-navigation .main-nav ul li a {
   font-weight: 500;
   font-size: var(--nl-text-sm);
@@ -19,14 +20,11 @@
 }
 .main-navigation .main-nav ul li a:hover,
 .main-navigation .main-nav ul li.current-menu-item > a {
-  color: var(--nl-blue);
+  color: var(--nl-text);
   background: transparent;
 }
 
-/* Subrayado que crece desde el centro al pasar por encima. */
-.main-navigation .main-nav ul li > a {
-  position: relative;
-}
+.main-navigation .main-nav ul li > a { position: relative; }
 .main-navigation .main-nav ul li > a::after {
   content: '';
   position: absolute;
@@ -34,7 +32,7 @@
   right: 50%;
   bottom: 12px;
   height: 2px;
-  background: var(--nl-blue);
+  background: var(--nl-red);
   border-radius: 2px;
   transition: left var(--nl-transition), right var(--nl-transition);
 }
@@ -44,46 +42,128 @@
   right: 20px;
 }
 
-/* Botones ---------------------------------------------------------------- */
+/* Botones ----------------------------------------------------------------
 
-.wp-block-button__link,
-button:not(.nl-copy),
-input[type='submit'],
-.button {
+   GeneratePress publica los colores de botón del Customizer como CSS EN
+   LÍNEA, y su selector es:
+
+       a.wp-block-button__link:not(.has-background)
+
+   Eso son (0,2,1) de especificidad: `:not()` no vale cero, aporta la de su
+   argumento. Un `:root .wp-block-button__link` se queda en (0,2,0) y pierde
+   por un elemento — comprobado inyectando la regla y viendo que no ganaba.
+
+   La respuesta no es !important, es reproducir la forma del padre y sumarle
+   `:root`. Y ese `:not(.has-background)` es además la puerta que GeneratePress
+   deja abierta a propósito: si alguien fija un fondo desde el editor, gana esa
+   elección y no nosotros. Respetarla es gratis. */
+
+/* La firma del original: pastilla blanca, texto negro, radio 20px, peso 700.
+   El acento rojo se reserva para enlaces y detalles; un botón rojo grande
+   compite con él y el original no lo hace.
+
+   Lista de INCLUSIÓN, no de exclusión. Un `button:not(.nl-copy)` pintaba de
+   blanco el `button.menu-toggle` de GeneratePress —una barra blanca de 1062px
+   cruzando la cabecera— y cualquier control que el padre añadiera en el
+   futuro habría entrado igual. Una lista de exclusión sólo cubre lo que ya
+   conoces. */
+:root a.wp-block-button__link:not(.has-background),
+:root .entry-content button,
+:root input[type='submit'],
+:root a.button {
   font-family: var(--nl-font);
-  font-weight: 600;
+  font-weight: var(--nl-weight-strong);
   font-size: var(--nl-text-sm);
-  padding: 0.7em 1.5em;
-  border-radius: var(--nl-radius);
-  border: 0;
-  background: var(--nl-blue);
+  padding: 0.85em 1.7em;
+  border-radius: var(--nl-radius-btn);
+  border: 1px solid transparent;
+  background: var(--nl-text);
   color: var(--nl-text-invert);
-  box-shadow: var(--nl-shadow-sm);
-  transition: background var(--nl-transition), transform var(--nl-transition),
-              box-shadow var(--nl-transition);
+  text-decoration: none;
+  transition: transform var(--nl-transition), opacity var(--nl-transition),
+              background var(--nl-transition), border-color var(--nl-transition);
   cursor: pointer;
+  display: inline-block;
+  line-height: 1.2;
 }
-.wp-block-button__link:hover,
-button:not(.nl-copy):hover,
-input[type='submit']:hover,
-.button:hover {
-  background: var(--nl-blue-dark);
-  transform: translateY(-1px);
-  box-shadow: var(--nl-shadow);
+:root a.wp-block-button__link:not(.has-background):hover,
+:root .entry-content button:hover,
+:root input[type='submit']:hover,
+:root a.button:hover {
+  background: var(--nl-text);
   color: var(--nl-text-invert);
+  transform: translateY(-2px);
+  opacity: .9;
 }
-.wp-block-button__link:active,
-button:not(.nl-copy):active { transform: translateY(0); }
+:root a.wp-block-button__link:not(.has-background):active,
+:root .entry-content button:active { transform: translateY(0); }
 
-.wp-block-button.is-style-outline .wp-block-button__link {
+/* Los controles propios de GeneratePress —el menú móvil, el buscador— se
+   quedan discretos: son navegación, no llamadas a la acción. */
+:root .menu-toggle,
+:root .search-toggle,
+:root button.search-submit {
   background: transparent;
-  color: var(--nl-blue);
-  border: 1.5px solid var(--nl-blue);
-  box-shadow: none;
+  color: var(--nl-text-muted);
+  border: 0;
+  border-radius: var(--nl-radius);
 }
-.wp-block-button.is-style-outline .wp-block-button__link:hover {
-  background: var(--nl-blue);
+:root .menu-toggle:hover,
+:root .search-toggle:hover,
+:root button.search-submit:hover {
+  background: var(--nl-bg-subtle);
+  color: var(--nl-text);
+}
+
+
+/* Botones propios --------------------------------------------------------
+
+   Para el marcado que escribimos nosotros —portada, patrones— usamos nuestras
+   propias clases en vez de `wp-block-button__link`.
+
+   El motivo es concreto: GeneratePress estiliza esa clase desde el Customizer
+   con `a.wp-block-button__link:not(.has-background)`, y la variante fantasma
+   entraba en una pelea de especificidad que ganaba en `color` y perdía en
+   `background` — un botón blanco con texto blanco. Se puede ganar esa pelea,
+   pero es una pelea que se reabre cada vez que el padre cambie una regla.
+
+   Una clase propia no colisiona con nada. Los botones creados desde el editor
+   siguen usando las clases de WordPress y su estilo, que está más arriba. */
+
+:root .nl-btn {
+  display: inline-block;
+  font-family: var(--nl-font);
+  font-weight: var(--nl-weight-strong);
+  font-size: var(--nl-text-sm);
+  line-height: 1.2;
+  padding: 0.85em 1.7em;
+  border-radius: var(--nl-radius-btn);
+  border: 1px solid transparent;
+  background: var(--nl-text);
   color: var(--nl-text-invert);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--nl-transition), opacity var(--nl-transition),
+              background var(--nl-transition), border-color var(--nl-transition);
+}
+:root .nl-btn:hover {
+  background: var(--nl-text);
+  color: var(--nl-text-invert);
+  transform: translateY(-2px);
+  opacity: .9;
+}
+:root .nl-btn:active { transform: translateY(0); }
+
+:root .nl-btn--ghost {
+  background: transparent;
+  color: var(--nl-text);
+  border-color: var(--nl-border);
+}
+:root .nl-btn--ghost:hover {
+  background: var(--nl-bg-subtle);
+  border-color: var(--nl-text-faint);
+  color: var(--nl-text);
+  opacity: 1;
 }
 
 /* Héroe ------------------------------------------------------------------ */
@@ -93,47 +173,57 @@ button:not(.nl-copy):active { transform: translateY(0); }
   text-align: center;
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 70% 60% at 50% -10%,
-      color-mix(in srgb, var(--nl-blue) 14%, transparent), transparent),
-    var(--nl-bg-subtle);
-  border-bottom: 1px solid var(--nl-border);
+  background: var(--nl-bg);
 }
+
+/* El resplandor rojo detrás del titular, que es lo que da el carácter. */
+.nl-hero::before {
+  content: '';
+  position: absolute;
+  inset: -40% 0 auto 50%;
+  translate: -50% 0;
+  width: min(900px, 120%);
+  aspect-ratio: 1;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--nl-red) 22%, transparent) 0%,
+    transparent 62%);
+  pointer-events: none;
+  z-index: 0;
+}
+.nl-hero > * { position: relative; z-index: 1; }
 
 .nl-hero__eyebrow {
   display: inline-block;
   font-size: var(--nl-text-xs);
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--nl-blue);
-  background: color-mix(in srgb, var(--nl-blue) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--nl-blue) 25%, transparent);
-  padding: 0.35em 1em;
+  color: var(--nl-text-muted);
+  background: var(--nl-bg-subtle);
+  border: 1px solid var(--nl-border);
+  padding: 0.45em 1.1em;
   border-radius: var(--nl-radius-full);
-  margin-bottom: var(--nl-space-6);
+  margin-bottom: var(--nl-space-8);
 }
 
 .nl-hero__title {
-  font-size: clamp(2.25rem, 6vw, var(--nl-text-4xl));
-  font-weight: 800;
+  font-size: clamp(2.5rem, 7vw, var(--nl-text-4xl));
+  font-weight: var(--nl-weight-title);
   letter-spacing: -0.035em;
-  line-height: 1.08;
+  line-height: 1.05;
   margin: 0 0 var(--nl-space-6);
   text-wrap: balance;
+  color: var(--nl-text);
 }
 .nl-hero__title em {
   font-style: normal;
-  background: linear-gradient(120deg, var(--nl-blue), var(--nl-green));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--nl-red);
 }
 
 .nl-hero__lead {
   font-size: var(--nl-text-lg);
   color: var(--nl-text-muted);
-  max-width: 40rem;
+  max-width: 38rem;
   margin: 0 auto var(--nl-space-8);
   text-wrap: pretty;
 }
@@ -150,35 +240,36 @@ button:not(.nl-copy):active { transform: translateY(0); }
 .nl-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
-  gap: var(--nl-space-6);
+  gap: var(--nl-space-4);
   margin: var(--nl-space-12) 0;
 }
 
 .nl-card {
-  background: var(--nl-bg);
-  border: 1px solid var(--nl-border);
+  background: var(--nl-bg-subtle);
+  border: 1px solid var(--nl-border-soft);
   border-radius: var(--nl-radius-lg);
   padding: var(--nl-space-6);
-  transition: transform var(--nl-transition), box-shadow var(--nl-transition),
-              border-color var(--nl-transition);
+  transition: background var(--nl-transition), border-color var(--nl-transition),
+              transform var(--nl-transition);
   display: flex;
   flex-direction: column;
 }
 .nl-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--nl-shadow-lg);
-  border-color: color-mix(in srgb, var(--nl-blue) 40%, var(--nl-border));
+  background: var(--nl-bg-sunken);
+  border-color: var(--nl-border);
+  transform: translateY(-2px);
 }
 
-.nl-card__icon { font-size: 1.75rem; line-height: 1; margin-bottom: var(--nl-space-4); }
+.nl-card__icon { font-size: 1.6rem; line-height: 1; margin-bottom: var(--nl-space-4); }
 
 .nl-card__title {
   font-size: var(--nl-text-lg);
-  font-weight: 700;
+  font-weight: 600;
   margin: 0 0 var(--nl-space-2);
+  letter-spacing: -0.015em;
 }
 .nl-card__title a { color: var(--nl-text); text-decoration: none; }
-.nl-card__title a:hover { color: var(--nl-blue); }
+.nl-card__title a:hover { color: var(--nl-red-soft); }
 
 .nl-card__body {
   color: var(--nl-text-muted);
@@ -190,13 +281,11 @@ button:not(.nl-copy):active { transform: translateY(0); }
 .nl-card__cta {
   font-size: var(--nl-text-sm);
   font-weight: 600;
+  color: var(--nl-red-soft);
   text-decoration: none;
 }
-.nl-card__cta::after {
-  content: ' →';
-  transition: margin var(--nl-transition);
-}
-.nl-card:hover .nl-card__cta::after { margin-left: 3px; }
+.nl-card__cta::after { content: ' →'; transition: margin var(--nl-transition); }
+.nl-card:hover .nl-card__cta::after { margin-left: 4px; }
 
 /* Avisos ----------------------------------------------------------------- */
 
@@ -204,22 +293,18 @@ button:not(.nl-copy):active { transform: translateY(0); }
   border-radius: var(--nl-radius);
   padding: var(--nl-space-4) var(--nl-space-6);
   margin: var(--nl-space-8) 0;
-  border-left: 4px solid var(--nl-blue);
-  background: color-mix(in srgb, var(--nl-blue) 7%, var(--nl-bg));
+  border: 1px solid var(--nl-border-soft);
+  border-left: 3px solid var(--nl-red);
+  background: var(--nl-bg-subtle);
   font-size: var(--nl-text-sm);
 }
-.nl-note--warn {
-  border-left-color: var(--nl-warn);
-  background: color-mix(in srgb, var(--nl-warn) 8%, var(--nl-bg));
-}
-.nl-note--danger {
-  border-left-color: var(--nl-danger);
-  background: color-mix(in srgb, var(--nl-danger) 8%, var(--nl-bg));
-}
+.nl-note--warn   { border-left-color: var(--nl-warn); }
+.nl-note--danger { border-left-color: var(--nl-danger); }
 .nl-note__title {
-  font-weight: 700;
+  font-weight: var(--nl-weight-strong);
   margin: 0 0 var(--nl-space-2);
   font-size: var(--nl-text-sm);
+  color: var(--nl-text);
 }
 .nl-note p:last-child { margin-bottom: 0; }
 
@@ -235,7 +320,7 @@ button:not(.nl-copy):active { transform: translateY(0); }
   font-size: var(--nl-text-xs);
   font-weight: 600;
   padding: 0.35em 0.8em;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--nl-code-overlay-border);
   background: var(--nl-code-overlay);
   color: var(--nl-on-code);
@@ -248,22 +333,49 @@ button:not(.nl-copy):active { transform: translateY(0); }
 .nl-copy:hover { background: var(--nl-code-overlay-hover); color: var(--nl-on-code-strong); }
 .nl-copy[data-state='done'] {
   opacity: 1;
-  color: var(--nl-green);
-  border-color: color-mix(in srgb, var(--nl-green) 45%, transparent);
+  color: var(--nl-ok);
+  border-color: color-mix(in srgb, var(--nl-ok) 45%, transparent);
 }
 
-/* En pantallas táctiles no hay hover, así que el botón se queda visible. */
-@media (hover: none) {
-  .nl-copy { opacity: 1; }
-}
+@media (hover: none) { .nl-copy { opacity: 1; } }
 
 /* Pie -------------------------------------------------------------------- */
 
 .site-footer {
-  background: var(--nl-bg-subtle);
-  border-top: 1px solid var(--nl-border);
+  background: var(--nl-bg);
+  border-top: 1px solid var(--nl-border-soft);
   color: var(--nl-text-muted);
   font-size: var(--nl-text-sm);
 }
 .site-footer a { color: var(--nl-text-muted); }
-.site-footer a:hover { color: var(--nl-blue); }
+.site-footer a:hover { color: var(--nl-text); }
+
+/* Widgets de la barra lateral -------------------------------------------- */
+
+.widget, .sidebar .widget {
+  background: var(--nl-bg-subtle);
+  border: 1px solid var(--nl-border-soft);
+  border-radius: var(--nl-radius);
+}
+.widget .widget-title {
+  font-size: var(--nl-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nl-text-faint);
+  margin-top: 0;
+}
+.widget ul li a { color: var(--nl-text-muted); text-decoration: none; }
+.widget ul li a:hover { color: var(--nl-red-soft); }
+
+/* Campos de formulario ---------------------------------------------------- */
+
+input[type='text'], input[type='email'], input[type='url'],
+input[type='search'], input[type='password'], textarea, select {
+  background: var(--nl-bg-subtle);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius);
+  color: var(--nl-text);
+  padding: 0.7em 1em;
+}
+input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
