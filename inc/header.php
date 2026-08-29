@@ -26,7 +26,7 @@ function nestjslatam_header_fallback() {
 		return;
 	}
 
-	$logo = get_stylesheet_directory_uri() . '/assets/img/logo-96.png';
+	$img = get_stylesheet_directory_uri() . '/assets/img/';
 
 	printf(
 		'<div class="nl-brand"><a class="nl-brand__link" href="%1$s" rel="home">'
@@ -38,9 +38,13 @@ function nestjslatam_header_fallback() {
 		esc_url( home_url( '/' ) ),
 		esc_html( get_bloginfo( 'name' ) ),
 		esc_html( get_bloginfo( 'description' ) ),
+		// srcset con el doble de densidad: el medallón tiene mucho detalle y
+		// a 1× sobre una pantalla retina se ve emborronado.
 		sprintf(
-			'<img class="nl-brand__mark" src="%s" width="34" height="34" alt="" decoding="async">',
-			esc_url( $logo )
+			'<img class="nl-brand__mark" src="%1$s" srcset="%1$s 1x, %2$s 2x"'
+				. ' width="52" height="52" alt="" decoding="async">',
+			esc_url( $img . 'logo-96.png' ),
+			esc_url( $img . 'logo-192.png' )
 		)
 	);
 }

@@ -1,46 +1,151 @@
 /* Piezas reutilizables: cabecera, navegación, botones, tarjetas, pie. */
 
-/* Cabecera --------------------------------------------------------------- */
+/* Cabecera ---------------------------------------------------------------
+
+   GeneratePress pinta la marca y la navegación en dos bloques hermanos, y por
+   defecto se leen como dos barras apiladas con aire muerto entre ellas. Aquí
+   se tratan como una sola pieza: sin separador entre ambas, con la misma
+   superficie y un filete de acento arriba del todo. */
 
 .site-header {
-  background: color-mix(in srgb, var(--nl-bg) 80%, transparent);
-  border-bottom: 1px solid var(--nl-border-soft);
-  backdrop-filter: saturate(180%) blur(14px);
+  background: color-mix(in srgb, var(--nl-bg) 82%, transparent);
+  border-bottom: 0;
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
   position: sticky;
   top: 0;
   z-index: 100;
+  padding-block: 0;          /* el aire lo pone .inside-header, no la banda */
 }
 
-.main-navigation { background: transparent; }
+/* Un filete de tres píxeles con el degradado de la marca. Es lo que hace que
+   la cabecera se lea como intencionada y no como el valor por defecto. */
+.site-header::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    var(--nl-red) 0%,
+    var(--nl-red-soft) 38%,
+    var(--nl-gold) 70%,
+    var(--nl-red) 100%);
+}
+
+/* Marca y navegación son dos elementos hermanos en GeneratePress y por
+   defecto se leen como dos barras apiladas. Ajustando el aire de cada una y
+   quitando el hueco entre ambas, la cabecera pasa a leerse como una sola
+   banda de unos 108 px. */
+.site-header .inside-header {
+  padding-block: var(--nl-space-4) var(--nl-space-3);
+  align-items: center;
+}
+
+/* La marca ---------------------------------------------------------------- */
+
+.nl-brand__link,
+.site-branding a,
+.site-logo a { text-decoration: none; }
+
+.nl-brand__mark,
+.site-logo img,
+.header-image {
+  filter: drop-shadow(0 2px 10px color-mix(in srgb, var(--nl-red) 40%, transparent));
+  transition: transform var(--nl-transition), filter var(--nl-transition);
+}
+.nl-brand__link:hover .nl-brand__mark,
+.site-logo a:hover img {
+  transform: scale(1.04) rotate(-3deg);
+  filter: drop-shadow(0 3px 16px color-mix(in srgb, var(--nl-red) 62%, transparent));
+}
+
+.nl-brand__name,
+.site-title a {
+  font-size: var(--nl-text-xl);
+  font-weight: var(--nl-weight-strong);
+  letter-spacing: -0.028em;
+  color: var(--nl-text);
+  line-height: 1.05;
+}
+.nl-brand__tag,
+.site-description {
+  font-size: var(--nl-text-xs);
+  color: var(--nl-text-muted);
+  letter-spacing: .015em;
+  line-height: 1.35;
+  margin-top: 3px;
+  padding-left: 10px;
+  border-left: 2px solid color-mix(in srgb, var(--nl-red) 55%, transparent);
+}
+
+/* La navegación ----------------------------------------------------------- */
+
+.main-navigation {
+  background: transparent;
+  border-top: 1px solid var(--nl-border-soft);
+  border-bottom: 1px solid var(--nl-border-soft);
+  margin-top: 0;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+.main-navigation .inside-navigation { padding-block: 0; align-items: center; }
+.main-navigation .main-nav > ul > li > a { padding-block: 0.85em; }
+
+/* Al hacer scroll la marca sube y la navegación se queda: es la barra que
+   sirve para moverse, y la que conviene tener siempre a mano. */
+.site-header { position: relative; }
+
 .main-navigation .main-nav ul li a {
   font-weight: 500;
   font-size: var(--nl-text-sm);
   color: var(--nl-text-muted);
+  letter-spacing: -0.005em;
   transition: color var(--nl-transition);
+  position: relative;
 }
 .main-navigation .main-nav ul li a:hover,
-.main-navigation .main-nav ul li.current-menu-item > a {
+.main-navigation .main-nav ul li.current-menu-item > a,
+.main-navigation .main-nav ul li.current-menu-ancestor > a {
   color: var(--nl-text);
   background: transparent;
 }
 
-.main-navigation .main-nav ul li > a { position: relative; }
-.main-navigation .main-nav ul li > a::after {
+/* Subrayado que crece desde el centro. */
+.main-navigation .main-nav > ul > li > a::after {
   content: '';
   position: absolute;
   left: 50%;
   right: 50%;
-  bottom: 12px;
+  bottom: 10px;
   height: 2px;
-  background: var(--nl-red);
   border-radius: 2px;
+  background: linear-gradient(90deg, var(--nl-red), var(--nl-red-soft));
   transition: left var(--nl-transition), right var(--nl-transition);
 }
-.main-navigation .main-nav ul li > a:hover::after,
-.main-navigation .main-nav ul li.current-menu-item > a::after {
-  left: 20px;
-  right: 20px;
+.main-navigation .main-nav > ul > li > a:hover::after,
+.main-navigation .main-nav > ul > li.current-menu-item > a::after,
+.main-navigation .main-nav > ul > li.current-menu-ancestor > a::after {
+  left: 18px;
+  right: 18px;
 }
+
+/* Submenús: superficie sólida, no la translúcida de la cabecera, o el texto
+   de debajo se transparenta a través. */
+.main-navigation ul ul {
+  background: var(--nl-bg-solid);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius);
+  box-shadow: var(--nl-shadow-lg);
+  padding: var(--nl-space-2);
+  min-width: 14rem;
+}
+.main-navigation ul ul li a { border-radius: var(--nl-radius); padding: 0.55em 0.8em; }
+.main-navigation ul ul li a:hover { background: var(--nl-bg-subtle); }
+.main-navigation ul ul > li > a::after { content: none; }
+
+/* El botón de menú en móvil, discreto. */
+.menu-toggle { font-size: var(--nl-text-sm); font-weight: 600; }
 
 /* Botones ----------------------------------------------------------------
 
@@ -389,7 +494,7 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
   text-decoration: none;
   padding: var(--nl-space-3) 0;
 }
-.nl-brand__mark { display: block; flex-shrink: 0; width: 34px; height: 34px; border-radius: 0; }
+.nl-brand__mark { display: block; flex-shrink: 0; width: 52px; height: 52px; border-radius: 0; }
 .nl-brand__text { display: flex; flex-direction: column; gap: 1px; }
 .nl-brand__name {
   font-weight: var(--nl-weight-strong);
@@ -605,3 +710,63 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
   .nl-account__menu { width: calc(100vw - 2rem); right: -0.5rem; }
   .nl-account__name { display: none; }
 }
+
+/* Acciones de la barra de navegación ------------------------------------- */
+
+.nl-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--nl-space-2);
+  margin-left: auto;
+}
+
+.nl-actions__link {
+  font-size: var(--nl-text-sm);
+  font-weight: 500;
+  color: var(--nl-text-muted);
+  text-decoration: none;
+  padding: 0.45em 0.75em;
+  border-radius: var(--nl-radius);
+  transition: color var(--nl-transition), background var(--nl-transition);
+}
+.nl-actions__link:hover { color: var(--nl-text); background: var(--nl-bg-subtle); }
+
+/* El destino principal del sitio va marcado, pero en fantasma: un botón
+   sólido aquí competiría con las llamadas a la acción del contenido. */
+.nl-actions__docs {
+  font-size: var(--nl-text-sm);
+  font-weight: 600;
+  color: var(--nl-text);
+  text-decoration: none;
+  padding: 0.45em 1.05em;
+  border-radius: var(--nl-radius-full);
+  border: 1px solid var(--nl-border);
+  background: var(--nl-bg-subtle);
+  transition: all var(--nl-transition);
+  white-space: nowrap;
+}
+.nl-actions__docs:hover {
+  color: var(--nl-text);
+  border-color: color-mix(in srgb, var(--nl-red) 55%, transparent);
+  background: color-mix(in srgb, var(--nl-red) 12%, transparent);
+}
+
+.nl-actions__gh {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--nl-radius-full);
+  color: var(--nl-text-muted);
+  transition: color var(--nl-transition), background var(--nl-transition);
+}
+.nl-actions__gh:hover { color: var(--nl-text); background: var(--nl-bg-subtle); }
+
+/* Debajo de 900 px sobran los textos: el icono y la cuenta bastan, y el
+   menú desplegable ya lleva los mismos destinos. */
+@media (max-width: 900px) {
+  .nl-actions__link,
+  .nl-actions__docs { display: none; }
+}
+
+.nl-account { margin-left: var(--nl-space-2); }

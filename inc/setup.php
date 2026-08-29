@@ -133,3 +133,38 @@ function nestjslatam_external_links( $content ) {
 	);
 }
 add_filter( 'the_content', 'nestjslatam_external_links', 20 );
+
+/**
+ * Los extractos automáticos, sin bloques de código.
+ *
+ * WordPress genera el extracto recortando el contenido entero, y en un blog
+ * técnico eso significa que la tarjeta del listado enseña media línea de
+ * TypeScript con las comillas escapadas. Ilegible, y además desperdicia el
+ * único sitio donde el lector decide si entra o no.
+ *
+ * Se quitan <pre>, <code>, <table> y <blockquote> antes de recortar, así que
+ * el extracto sale de la prosa. Si la entrada tiene extracto escrito a mano,
+ * este filtro no se ejecuta: WordPress lo prefiere siempre.
+ */
+function nestjslatam_excerpt_sin_codigo( $texto, $post ) {
+	if ( ! empty( $post->post_excerpt ) ) {
+		return $texto;
+	}
+
+	$contenido = $post->post_content;
+	$contenido = preg_replace(
+		'#<(pre|table|blockquote)\b[^>]*>.*?</\1>#is',
+		' ',
+		$contenido
+	);
+	$contenido = preg_replace( '#<code\b[^>]*>.*?</code>#is', ' ', $contenido );
+	$contenido = strip_shortcodes( $contenido );
+	$contenido = excerpt_remove_blocks( $contenido );
+
+	return wp_trim_words(
+		wp_strip_all_tags( $contenido ),
+		apply_filters( 'excerpt_length', 40 ),
+		apply_filters( 'excerpt_more', '…' )
+	);
+}
+add_filter( 'get_the_excerpt', 'nestjslatam_excerpt_sin_codigo', 10, 2 );

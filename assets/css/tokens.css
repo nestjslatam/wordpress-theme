@@ -12,6 +12,9 @@
   --nl-red:        #ea2845;
   --nl-red-soft:   #ff5c74;
   --nl-red-deep:   #c11a33;
+  /* El oro de la greca del medallón. Forma parte de la identidad tanto como
+     el rojo, y sin él el filete de la cabecera pierde el guiño andino. */
+  --nl-gold:       #ffb75c;
 
   /* Superficies. El negro no es puro: lleva un punto cálido, como el original. */
   --nl-bg:          #050303;
