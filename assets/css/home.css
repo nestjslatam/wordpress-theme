@@ -456,3 +456,81 @@
   border-color: var(--nl-border);
   background: var(--nl-bg-sunken);
 }
+
+/* Formas de participar, numeradas ---------------------------------------- */
+
+.nl-way { position: relative; padding-top: var(--nl-space-8); }
+
+.nl-way__num {
+  position: absolute;
+  top: var(--nl-space-4);
+  right: var(--nl-space-5, 1.25rem);
+  font-family: var(--nl-font-mono);
+  font-size: var(--nl-text-2xl);
+  font-weight: 500;
+  line-height: 1;
+  color: color-mix(in srgb, var(--nl-red) 26%, transparent);
+  pointer-events: none;
+}
+.nl-way__title { font-size: var(--nl-text-base); margin-bottom: var(--nl-space-3); }
+.nl-way__body  { margin-bottom: var(--nl-space-4); }
+.nl-way__cta {
+  font-size: var(--nl-text-sm);
+  font-weight: 600;
+  color: var(--nl-red-soft);
+  text-decoration: none;
+}
+.nl-way__cta::after { content: ' →'; transition: margin var(--nl-transition); }
+.nl-way:hover .nl-way__cta::after { margin-left: 4px; }
+.nl-way {
+  transition: border-color var(--nl-transition), background var(--nl-transition),
+              transform var(--nl-transition);
+}
+.nl-way:hover {
+  border-color: var(--nl-border);
+  background: var(--nl-bg-sunken);
+  transform: translateY(-2px);
+}
+
+/* Rejilla de repositorios ------------------------------------------------- */
+
+.nl-repos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--nl-space-4);
+}
+
+.nl-repo {
+  display: grid;
+  gap: var(--nl-space-2);
+  padding: var(--nl-space-6);
+  border: 1px solid var(--nl-border-soft);
+  border-radius: var(--nl-radius-lg);
+  background: var(--nl-bg-subtle);
+  text-decoration: none;
+  transition: border-color var(--nl-transition), background var(--nl-transition),
+              transform var(--nl-transition);
+}
+.nl-repo:hover {
+  border-color: color-mix(in srgb, var(--nl-red) 40%, var(--nl-border));
+  background: var(--nl-bg-sunken);
+  transform: translateY(-2px);
+}
+.nl-repo__icon { font-size: 1.5rem; line-height: 1; }
+.nl-repo__name {
+  font-family: var(--nl-font-mono);
+  font-size: var(--nl-text-base);
+  font-weight: 500;
+  color: var(--nl-text);
+}
+.nl-repo:hover .nl-repo__name { color: var(--nl-red-soft); }
+.nl-repo__what { font-size: var(--nl-text-sm); color: var(--nl-text-muted); line-height: 1.55; }
+.nl-repo__tag {
+  font-size: var(--nl-text-xs);
+  color: var(--nl-text-faint);
+  font-family: var(--nl-font-mono);
+  margin-top: var(--nl-space-2);
+}
+
+/* En la página de comunidad las cifras van sin bordes laterales. */
+.page .nl-stats { border-inline: 0; border-radius: var(--nl-radius-lg); }

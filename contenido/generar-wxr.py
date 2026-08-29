@@ -70,6 +70,7 @@ PAGINAS = [
     ('Guía del CLI',     'guia-cli',      'guia-cli.html',     4),
     ('Acceso',           'acceso',        'acceso.html',       9),
     ('Aviso legal',      'aviso-legal',   'aviso-legal.html', 10),
+    ('Contacto',         'contacto',      'contacto.html',    11),
     ('Comunidad',        'comunidad',     'comunidad.html',    5),
     # El blog va vacío a propósito: WordPress lo rellena al designarlo como
     # "página de entradas" en Ajustes -> Lectura.
@@ -109,26 +110,34 @@ ARTICULOS = [
 YA_EXISTEN = {'about', 'contact'}
 
 MENU = [
-    ('Inicio',            f'{DOMINIO}/inicio/',                                        None),
-    ('Documentación',     f'{DOMINIO}/documentacion/',                                 None),
-    ('Guía de ddd-lib',   f'{DOMINIO}/guia-ddd-lib/',                                  'Documentación'),
-    ('Guía del CLI',      f'{DOMINIO}/guia-cli/',                                      'Documentación'),
-    ('Referencia completa','https://docs.nestjslatam.dev',                             'Documentación'),
-    ('Referencia de API', 'https://docs.nestjslatam.dev/guia/api',                     'Documentación'),
-    ('Value objects',     'https://docs.nestjslatam.dev/valueobjects/',                'Documentación'),
-    ('Event sourcing',    'https://docs.nestjslatam.dev/event-sourcing/',              'Documentación'),
-    ('Guías y How-To',    f'{DOMINIO}/guias/',                                         None),
-    ('Tu primer agregado', f'{DOMINIO}/como-montar-tu-primer-agregado-paso-a-paso/',   'Guías y How-To'),
-    ('Probar un agregado', f'{DOMINIO}/como-probar-un-agregado/',                      'Guías y How-To'),
-    ('Modelar dinero',    f'{DOMINIO}/como-modelar-dinero-sin-equivocarte/',           'Guías y How-To'),
-    ('Migrar a la 4.0.0', f'{DOMINIO}/como-migrar-de-ddd-lib-3-a-4/',                  'Guías y How-To'),
-    ('CLI',               f'{DOMINIO}/guia-cli/',                                      None),
-    ('Guía extendida',    'https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md', 'CLI'),
-    ('Servidor MCP',      'https://docs.nestjslatam.dev/cli/mcp',                      'CLI'),
-    ('Conectarlo a tu agente', f'{DOMINIO}/como-conectar-el-cli-a-tu-agente-por-mcp/', 'CLI'),
-    ('Blog',              f'{DOMINIO}/blog/',                                          None),
-    ('Comunidad',         f'{DOMINIO}/comunidad/',                                     None),
-    ('GitHub',            'https://github.com/nestjslatam',                            None),
+    ('Inicio',                 f'{DOMINIO}/inicio/',                                        None),
+
+    ('Documentación',          f'{DOMINIO}/documentacion/',                                 None),
+    ('Guía de ddd-lib',        f'{DOMINIO}/guia-ddd-lib/',                                  'Documentación'),
+    ('Guía del CLI',           f'{DOMINIO}/guia-cli/',                                      'Documentación'),
+    ('Referencia completa',    'https://docs.nestjslatam.dev',                              'Documentación'),
+    ('Value objects',          'https://docs.nestjslatam.dev/valueobjects/',                'Documentación'),
+    ('Event sourcing',         'https://docs.nestjslatam.dev/event-sourcing/',              'Documentación'),
+    ('Referencia de API',      'https://docs.nestjslatam.dev/guia/api',                     'Documentación'),
+    ('Guía extendida del CLI', 'https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md', 'Documentación'),
+    ('Servidor MCP',           'https://docs.nestjslatam.dev/cli/mcp',                      'Documentación'),
+
+    ('Tutoriales',             f'{DOMINIO}/guias/',                                         None),
+    ('Tu primer agregado',     f'{DOMINIO}/como-montar-tu-primer-agregado-paso-a-paso/',    'Tutoriales'),
+    ('Probar un agregado',     f'{DOMINIO}/como-probar-un-agregado/',                       'Tutoriales'),
+    ('Modelar dinero',         f'{DOMINIO}/como-modelar-dinero-sin-equivocarte/',           'Tutoriales'),
+    ('Migrar a la 4.0.0',      f'{DOMINIO}/como-migrar-de-ddd-lib-3-a-4/',                  'Tutoriales'),
+    ('Conectar el CLI a tu agente', f'{DOMINIO}/como-conectar-el-cli-a-tu-agente-por-mcp/', 'Tutoriales'),
+
+    ('Blog',                   f'{DOMINIO}/blog/',                                          None),
+    ('Comunidad',              f'{DOMINIO}/comunidad/',                                     None),
+
+    ('Repositorios',           'https://github.com/nestjslatam',                            None),
+    ('ddd-lib ',               'https://github.com/nestjslatam/ddd',                        'Repositorios'),
+    ('ddd-cli',                'https://github.com/nestjslatam/ddd-cli',                    'Repositorios'),
+    ('ddd-valueobjects',       'https://github.com/nestjslatam/ddd-valueobjects',           'Repositorios'),
+    ('ddd-event-sourcing',     'https://github.com/nestjslatam/ddd-event-sourcing',         'Repositorios'),
+    ('Documentación ',         'https://github.com/nestjslatam/docs',                       'Repositorios'),
 ]
 
 # ── Construcción ───────────────────────────────────────────────────────────

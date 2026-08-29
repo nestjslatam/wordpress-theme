@@ -134,6 +134,7 @@ function nestjslatam_favicon() {
 add_action( 'wp_head', 'nestjslatam_favicon', 5 );
 
 require_once get_stylesheet_directory() . '/inc/header.php';
+require_once get_stylesheet_directory() . '/inc/contacto.php';
 require_once get_stylesheet_directory() . '/inc/menu.php';
 require_once get_stylesheet_directory() . '/inc/auth.php';
 require_once get_stylesheet_directory() . '/inc/footer.php';

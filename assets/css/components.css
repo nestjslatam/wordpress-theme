@@ -90,7 +90,24 @@
   z-index: 99;
 }
 .main-navigation .inside-navigation { padding-block: 0; align-items: center; }
-.main-navigation .main-nav > ul > li > a { padding-block: 0.85em; }
+
+/* Altura fija y separación uniforme. El espaciado por defecto de
+   GeneratePress depende del largo de cada texto, y con entradas de una y de
+   trece letras la fila se lee irregular. */
+.main-navigation .main-nav > ul > li > a {
+  padding: 0 var(--nl-space-5, 1.25rem);
+  height: 52px;
+  display: flex;
+  align-items: center;
+}
+.main-navigation .main-nav > ul > li:first-child > a { padding-left: 0; }
+
+/* El indicador de submenú, más discreto que la flecha por defecto. */
+.main-navigation .main-nav ul li.menu-item-has-children > a .dropdown-menu-toggle {
+  padding-left: 4px;
+  opacity: .55;
+}
+.main-navigation .main-nav ul li.menu-item-has-children > a:hover .dropdown-menu-toggle { opacity: 1; }
 
 /* Al hacer scroll la marca sube y la navegación se queda: es la barra que
    sirve para moverse, y la que conviene tener siempre a mano. */
@@ -117,7 +134,7 @@
   position: absolute;
   left: 50%;
   right: 50%;
-  bottom: 10px;
+  bottom: 0;
   height: 2px;
   border-radius: 2px;
   background: linear-gradient(90deg, var(--nl-red), var(--nl-red-soft));
@@ -126,9 +143,11 @@
 .main-navigation .main-nav > ul > li > a:hover::after,
 .main-navigation .main-nav > ul > li.current-menu-item > a::after,
 .main-navigation .main-nav > ul > li.current-menu-ancestor > a::after {
-  left: 18px;
-  right: 18px;
+  left: var(--nl-space-5, 1.25rem);
+  right: var(--nl-space-5, 1.25rem);
 }
+.main-navigation .main-nav > ul > li:first-child > a:hover::after,
+.main-navigation .main-nav > ul > li:first-child.current-menu-item > a::after { left: 0; }
 
 /* Submenús: superficie sólida, no la translúcida de la cabecera, o el texto
    de debajo se transparenta a través. */
@@ -600,7 +619,15 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
 
 .nl-account { position: relative; display: flex; align-items: center; margin-left: var(--nl-space-4); }
 
-.nl-account__in {
+/* El botón vive DENTRO de la navegación, y GeneratePress colorea los enlaces
+   de la nav con selectores encadenados del tipo
+   `.main-navigation .main-nav ul li a`, bastante más específicos que una
+   clase suelta. El texto salía blanco sobre el fondo blanco del botón: el
+   botón parecía vacío.
+   Se encadena por el contenedor para ganar por especificidad y no con
+   !important, que dejaría el estilo imposible de ajustar más adelante. */
+:root .main-navigation .nl-account .nl-account__in,
+:root .nl-account .nl-account__in {
   display: inline-block;
   font-size: var(--nl-text-sm);
   font-weight: 600;
@@ -612,7 +639,12 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
   text-decoration: none;
   transition: opacity var(--nl-transition), transform var(--nl-transition);
 }
-.nl-account__in:hover { opacity: .9; transform: translateY(-1px); color: var(--nl-text-invert); }
+:root .main-navigation .nl-account .nl-account__in:hover,
+:root .nl-account .nl-account__in:hover {
+  opacity: .9;
+  transform: translateY(-1px);
+  color: var(--nl-text-invert);
+}
 
 .nl-account__btn {
   display: flex;
@@ -681,6 +713,7 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
 
 .nl-account__links { list-style: none; padding: 0; margin: 0 0 var(--nl-space-3); }
 .nl-account__links li { margin: 0; }
+:root .main-navigation .nl-account__links a,
 .nl-account__links a {
   display: block;
   padding: 0.5em 0.6em;
@@ -720,11 +753,15 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
 .nl-actions {
   display: flex;
   align-items: center;
+  gap: 2px;
   margin-left: auto;
-  padding: 3px;
+  padding: 4px;
   border-radius: var(--nl-radius-full);
   border: 1px solid var(--nl-border-soft);
   background: var(--nl-bg-subtle);
+  /* El mismo tratamiento que los bloques de atribución del pie: superficie
+     tenue con borde fino. Así la cabecera y el pie se reconocen como del
+     mismo sistema. */
 }
 
 .nl-actions__gh {
@@ -796,3 +833,76 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
 .nl-disclaimer strong { color: var(--nl-text); }
 .nl-disclaimer a { color: var(--nl-red-soft); text-decoration: none; }
 .nl-disclaimer a:hover { text-decoration: underline; }
+
+/* Formulario de contacto -------------------------------------------------- */
+
+.nl-contacto { max-width: 44rem; margin: var(--nl-space-8) 0; }
+
+.nl-contacto__form {
+  display: grid;
+  gap: var(--nl-space-5);
+  padding: var(--nl-space-8);
+  border: 1px solid var(--nl-border-soft);
+  border-radius: var(--nl-radius-lg);
+  background: var(--nl-bg-subtle);
+}
+
+.nl-contacto__fila { display: grid; gap: var(--nl-space-5); }
+@media (min-width: 640px) { .nl-contacto__fila { grid-template-columns: 1fr 1fr; } }
+
+.nl-contacto label { display: grid; gap: var(--nl-space-2); }
+.nl-contacto label > span {
+  font-size: var(--nl-text-sm);
+  font-weight: 500;
+  color: var(--nl-text-muted);
+}
+
+.nl-contacto input[type='text'],
+.nl-contacto input[type='email'],
+.nl-contacto textarea {
+  width: 100%;
+  background: var(--nl-bg-solid);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius);
+  color: var(--nl-text);
+  font-family: var(--nl-font);
+  font-size: var(--nl-text-sm);
+  padding: 0.75em 1em;
+  transition: border-color var(--nl-transition), box-shadow var(--nl-transition);
+}
+.nl-contacto input:focus,
+.nl-contacto textarea:focus {
+  border-color: var(--nl-red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--nl-red) 20%, transparent);
+  outline: 2px solid transparent;   /* el anillo lo pinta el box-shadow */
+}
+.nl-contacto textarea { resize: vertical; min-height: 9rem; line-height: 1.6; }
+
+/* La trampa antirrobots se saca de la vista sin usar display:none, que
+   algunos bots detectan, y se marca aria-hidden para los lectores. */
+.nl-contacto__trampa {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.nl-contacto__pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nl-space-4);
+  align-items: center;
+}
+.nl-contacto__nota { font-size: var(--nl-text-xs); color: var(--nl-text-faint); }
+
+.nl-contacto__aviso {
+  padding: var(--nl-space-4) var(--nl-space-5);
+  border-radius: var(--nl-radius);
+  border: 1px solid var(--nl-border-soft);
+  border-left-width: 3px;
+  font-size: var(--nl-text-sm);
+  margin-bottom: var(--nl-space-6);
+}
+.nl-contacto__aviso--ok    { border-left-color: var(--nl-ok);     color: var(--nl-text); }
+.nl-contacto__aviso--error { border-left-color: var(--nl-danger); color: var(--nl-text); }

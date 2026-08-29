@@ -18,37 +18,63 @@ defined( 'ABSPATH' ) || exit;
  * `has_nav_menu()` decide, así que el día que se configure en Apariencia ->
  * Menús, esto deja de ejecutarse sin que haya que tocar nada.
  */
-function nestjslatam_menu_fallback() {
-	$destinos = array(
+/**
+ * Los destinos del sitio, en un solo sitio.
+ *
+ * Antes había dos listas escritas a mano —ésta y la del generador del XML— y
+ * se separaron: la guía extendida del CLI en GitHub y la sección CLI entera
+ * desaparecieron del menú sin que nada avisara. Una sola fuente evita que
+ * vuelva a pasar dentro del tema; `contenido/generar-wxr.py` se compara con
+ * ésta en CI.
+ */
+function nestjslatam_destinos() {
+	return array(
+		// Un solo destino de documentación. Antes había «Guías» y
+		// «Documentación» como dos entradas de primer nivel, y desde fuera son
+		// lo mismo: el visitante no tiene forma de saber cuál le toca.
 		array(
-			'texto' => __( 'Guías', 'nestjslatam' ),
-			'url'   => home_url( '/guias/' ),
+			'texto' => __( 'Documentación', 'nestjslatam' ),
+			'url'   => home_url( '/documentacion/' ),
 			'hijos' => array(
-				array( 'texto' => __( 'Guía de ddd-lib', 'nestjslatam' ), 'url' => home_url( '/guia-ddd-lib/' ) ),
-				array( 'texto' => __( 'Guía del CLI', 'nestjslatam' ),    'url' => home_url( '/guia-cli/' ) ),
-				array( 'texto' => __( 'Tu primer agregado', 'nestjslatam' ), 'url' => home_url( '/como-montar-tu-primer-agregado-paso-a-paso/' ) ),
-				array( 'texto' => __( 'Probar un agregado', 'nestjslatam' ),  'url' => home_url( '/como-probar-un-agregado/' ) ),
-				array( 'texto' => __( 'Migrar a la 4.0.0', 'nestjslatam' ),   'url' => home_url( '/como-migrar-de-ddd-lib-3-a-4/' ) ),
+				array( 'texto' => __( 'Guía de ddd-lib', 'nestjslatam' ),    'url' => home_url( '/guia-ddd-lib/' ) ),
+				array( 'texto' => __( 'Guía del CLI', 'nestjslatam' ),       'url' => home_url( '/guia-cli/' ) ),
+				array( 'texto' => __( 'Referencia completa', 'nestjslatam' ), 'url' => 'https://docs.nestjslatam.dev' ),
+				array( 'texto' => __( 'Value objects', 'nestjslatam' ),      'url' => 'https://docs.nestjslatam.dev/valueobjects/' ),
+				array( 'texto' => __( 'Event sourcing', 'nestjslatam' ),     'url' => 'https://docs.nestjslatam.dev/event-sourcing/' ),
+				array( 'texto' => __( 'Referencia de API', 'nestjslatam' ),  'url' => 'https://docs.nestjslatam.dev/guia/api' ),
+				array( 'texto' => __( 'Guía extendida del CLI', 'nestjslatam' ), 'url' => 'https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md' ),
+				array( 'texto' => __( 'Servidor MCP', 'nestjslatam' ),       'url' => 'https://docs.nestjslatam.dev/cli/mcp' ),
 			),
 		),
 		array(
-			'texto' => __( 'Documentación', 'nestjslatam' ),
-			// Apunta a la página del portal y no a docs.nestjslatam.dev: había
-			// dos destinos distintos con el mismo nombre, y el visitante no
-			// tenía forma de saber cuál le tocaba. La página es el índice y
-			// desde ahí se sale a la referencia.
-			'url'   => home_url( '/documentacion/' ),
+			'texto' => __( 'Tutoriales', 'nestjslatam' ),
+			'url'   => home_url( '/guias/' ),
 			'hijos' => array(
-				array( 'texto' => __( 'ddd-lib', 'nestjslatam' ),        'url' => 'https://docs.nestjslatam.dev/guia/' ),
-				array( 'texto' => __( 'CLI y MCP', 'nestjslatam' ),      'url' => 'https://docs.nestjslatam.dev/cli/' ),
-				array( 'texto' => __( 'Value objects', 'nestjslatam' ),  'url' => 'https://docs.nestjslatam.dev/valueobjects/' ),
-				array( 'texto' => __( 'Event sourcing', 'nestjslatam' ), 'url' => 'https://docs.nestjslatam.dev/event-sourcing/' ),
-				array( 'texto' => __( 'Referencia de API', 'nestjslatam' ), 'url' => 'https://docs.nestjslatam.dev/guia/api' ),
+				array( 'texto' => __( 'Tu primer agregado', 'nestjslatam' ),     'url' => home_url( '/como-montar-tu-primer-agregado-paso-a-paso/' ) ),
+				array( 'texto' => __( 'Probar un agregado', 'nestjslatam' ),     'url' => home_url( '/como-probar-un-agregado/' ) ),
+				array( 'texto' => __( 'Modelar dinero', 'nestjslatam' ),         'url' => home_url( '/como-modelar-dinero-sin-equivocarte/' ) ),
+				array( 'texto' => __( 'Migrar a la 4.0.0', 'nestjslatam' ),      'url' => home_url( '/como-migrar-de-ddd-lib-3-a-4/' ) ),
+				array( 'texto' => __( 'Conectar el CLI a tu agente', 'nestjslatam' ), 'url' => home_url( '/como-conectar-el-cli-a-tu-agente-por-mcp/' ) ),
 			),
 		),
 		array( 'texto' => __( 'Blog', 'nestjslatam' ),      'url' => home_url( '/blog/' ) ),
 		array( 'texto' => __( 'Comunidad', 'nestjslatam' ), 'url' => home_url( '/comunidad/' ) ),
+		array(
+			'texto' => __( 'Repositorios', 'nestjslatam' ),
+			'url'   => 'https://github.com/nestjslatam',
+			'hijos' => array(
+				array( 'texto' => 'ddd-lib',            'url' => 'https://github.com/nestjslatam/ddd' ),
+				array( 'texto' => 'ddd-cli',            'url' => 'https://github.com/nestjslatam/ddd-cli' ),
+				array( 'texto' => 'ddd-valueobjects',   'url' => 'https://github.com/nestjslatam/ddd-valueobjects' ),
+				array( 'texto' => 'ddd-event-sourcing', 'url' => 'https://github.com/nestjslatam/ddd-event-sourcing' ),
+				array( 'texto' => __( 'Documentación', 'nestjslatam' ), 'url' => 'https://github.com/nestjslatam/docs' ),
+			),
+		),
 	);
+}
+
+function nestjslatam_menu_fallback() {
+	$destinos = nestjslatam_destinos();
 
 	echo '<ul id="menu-respaldo" class="menu sf-menu">';
 
@@ -109,36 +135,7 @@ function nestjslatam_completar_menu( $items, $args ) {
 		return $items;
 	}
 
-	$esenciales = array(
-		array(
-			'texto' => __( 'Guías', 'nestjslatam' ),
-			'url'   => home_url( '/guias/' ),
-			'hijos' => array(
-				array( 'texto' => __( 'Guía de ddd-lib', 'nestjslatam' ),    'url' => home_url( '/guia-ddd-lib/' ) ),
-				array( 'texto' => __( 'Guía del CLI', 'nestjslatam' ),       'url' => home_url( '/guia-cli/' ) ),
-				array( 'texto' => __( 'Tu primer agregado', 'nestjslatam' ), 'url' => home_url( '/como-montar-tu-primer-agregado-paso-a-paso/' ) ),
-				array( 'texto' => __( 'Probar un agregado', 'nestjslatam' ), 'url' => home_url( '/como-probar-un-agregado/' ) ),
-				array( 'texto' => __( 'Migrar a la 4.0.0', 'nestjslatam' ),  'url' => home_url( '/como-migrar-de-ddd-lib-3-a-4/' ) ),
-			),
-		),
-		array(
-			'texto' => __( 'Documentación', 'nestjslatam' ),
-			// Apunta a la página del portal y no a docs.nestjslatam.dev: había
-			// dos destinos distintos con el mismo nombre, y el visitante no
-			// tenía forma de saber cuál le tocaba. La página es el índice y
-			// desde ahí se sale a la referencia.
-			'url'   => home_url( '/documentacion/' ),
-			'hijos' => array(
-				array( 'texto' => __( 'ddd-lib', 'nestjslatam' ),           'url' => 'https://docs.nestjslatam.dev/guia/' ),
-				array( 'texto' => __( 'CLI y servidor MCP', 'nestjslatam' ), 'url' => 'https://docs.nestjslatam.dev/cli/' ),
-				array( 'texto' => __( 'Value objects', 'nestjslatam' ),      'url' => 'https://docs.nestjslatam.dev/valueobjects/' ),
-				array( 'texto' => __( 'Event sourcing', 'nestjslatam' ),     'url' => 'https://docs.nestjslatam.dev/event-sourcing/' ),
-				array( 'texto' => __( 'Referencia de API', 'nestjslatam' ),  'url' => 'https://docs.nestjslatam.dev/guia/api' ),
-			),
-		),
-		array( 'texto' => __( 'Blog', 'nestjslatam' ),      'url' => home_url( '/blog/' ) ),
-		array( 'texto' => __( 'Comunidad', 'nestjslatam' ), 'url' => home_url( '/comunidad/' ) ),
-	);
+	$esenciales = nestjslatam_destinos();
 
 	$añadidos = '';
 

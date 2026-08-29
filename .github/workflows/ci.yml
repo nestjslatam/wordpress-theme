@@ -44,3 +44,6 @@ jobs:
             echo "NESTJSLATAM_VERSION está escrita a mano; léela de style.css."
             exit 1
           fi
+
+      - name: Los dos menús llevan los mismos destinos
+        run: python3 scripts/comparar-menus.py
