@@ -81,3 +81,19 @@ jobs:
               sys.exit(1)
           print('  ✓ sin emoji')
           PY
+
+      - name: El mapa de slugs cubre todas las plantillas
+        run: |
+          # Una plantilla sin entrada en el mapa nunca se sirve, y la página
+          # sigue mostrando lo viejo sin que nada lo delate.
+          python3 - <<'PY'
+          import pathlib, re, sys
+          php = pathlib.Path('inc/paginas.php').read_text()
+          mapa = set(re.findall(r"=>\s*'([a-z-]+)',", php))
+          archivos = {f.stem for f in pathlib.Path('plantillas').glob('*.php')}
+          falta = archivos - mapa
+          if falta:
+              print('  plantillas sin entrada en el mapa:', ', '.join(sorted(falta)))
+              sys.exit(1)
+          print(f'  ✓ las {len(archivos)} plantillas están mapeadas')
+          PY

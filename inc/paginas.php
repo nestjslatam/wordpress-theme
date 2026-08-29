@@ -104,3 +104,51 @@ function nestjslatam_reparar_atributos( $contenido ) {
 	);
 }
 add_filter( 'the_content', 'nestjslatam_reparar_atributos', 6 );
+
+/**
+ * Sirve la plantilla del tema para las páginas que tienen una.
+ *
+ * El importador de WordPress NO actualiza lo que ya existe: se lo salta. Así
+ * que reimportar el XML deja intacto el contenido viejo de la base de datos, y
+ * la página sigue mostrando lo que se importó la primera vez —emoji incluidos—
+ * por mucho que la plantilla del tema haya cambiado.
+ *
+ * En vez de pedir que se borren las páginas y se reimporte, el tema decide:
+ * si existe `plantillas/<slug>.php`, esa es la fuente. La base de datos deja
+ * de ser relevante para estas páginas, que es lo que queríamos desde el
+ * principio.
+ *
+ * Una página sin plantilla —«Acerca de», «Contacto» heredadas, o cualquiera
+ * que se cree desde el editor— se renderiza con normalidad.
+ */
+function nestjslatam_contenido_de_plantilla( $contenido ) {
+	if ( ! is_page() || ! in_the_loop() || ! is_main_query() ) {
+		return $contenido;
+	}
+
+	$slug = get_post_field( 'post_name', get_the_ID() );
+
+	// El slug de la página y el nombre del fichero no siempre coinciden.
+	$mapa = array(
+		'inicio'        => 'portada',
+		'guia-ddd-lib'  => 'guia-ddd',
+		'guia-cli'      => 'guia-cli',
+		'documentacion' => 'documentacion',
+		'comunidad'     => 'comunidad',
+		'guias'         => 'guias',
+		'acceso'        => 'acceso',
+		'aviso-legal'   => 'aviso-legal',
+		'contacto'      => 'contacto',
+	);
+
+	if ( ! isset( $mapa[ $slug ] ) ) {
+		return $contenido;
+	}
+
+	$render = nestjslatam_pagina_shortcode( array( 'nombre' => $mapa[ $slug ] ) );
+
+	// Si la plantilla no existe o sale vacía, se respeta lo que hubiera: una
+	// página en blanco es peor que una desactualizada.
+	return '' !== $render ? $render : $contenido;
+}
+add_filter( 'the_content', 'nestjslatam_contenido_de_plantilla', 7 );
