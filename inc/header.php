@@ -26,9 +26,7 @@ function nestjslatam_header_fallback() {
 		return;
 	}
 
-	// El SVG va en línea, no como <img>: hereda currentColor, escala sin
-	// pixelarse y no cuesta una petición extra.
-	$marca = @file_get_contents( get_stylesheet_directory() . '/assets/img/logo.svg' );
+	$logo = get_stylesheet_directory_uri() . '/assets/img/logo-96.png';
 
 	printf(
 		'<div class="nl-brand"><a class="nl-brand__link" href="%1$s" rel="home">'
@@ -40,9 +38,10 @@ function nestjslatam_header_fallback() {
 		esc_url( home_url( '/' ) ),
 		esc_html( get_bloginfo( 'name' ) ),
 		esc_html( get_bloginfo( 'description' ) ),
-		// El SVG es un fichero del propio tema, no entrada del usuario; se
-		// imprime tal cual porque escaparlo lo mostraría como texto.
-		$marca ? '<span class="nl-brand__mark">' . $marca . '</span>' : ''
+		sprintf(
+			'<img class="nl-brand__mark" src="%s" width="34" height="34" alt="" decoding="async">',
+			esc_url( $logo )
+		)
 	);
 }
 add_action( 'generate_site_branding', 'nestjslatam_header_fallback' );

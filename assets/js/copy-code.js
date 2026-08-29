@@ -131,3 +131,50 @@
     init();
   }
 })();
+
+/**
+ * El desplegable de perfil de la cabecera.
+ *
+ * Va aquí y no en un fichero propio porque son treinta líneas y una petición
+ * más cuesta más que el byte que ahorra.
+ */
+(function () {
+  'use strict';
+
+  function init() {
+    var caja = document.querySelector('[data-nl-account]');
+    if (!caja) return;
+
+    var boton = caja.querySelector('.nl-account__btn');
+    var menu = caja.querySelector('.nl-account__menu');
+    if (!boton || !menu) return;
+
+    function abrir(si) {
+      menu.hidden = !si;
+      boton.setAttribute('aria-expanded', si ? 'true' : 'false');
+    }
+
+    boton.addEventListener('click', function (e) {
+      e.stopPropagation();
+      abrir(menu.hidden);
+    });
+
+    // Cerrar al pulsar fuera y con Escape: sin esto el menú se queda abierto
+    // y tapa el contenido en cuanto el usuario mira a otro sitio.
+    document.addEventListener('click', function (e) {
+      if (!caja.contains(e.target)) abrir(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !menu.hidden) {
+        abrir(false);
+        boton.focus();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

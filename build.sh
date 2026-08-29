@@ -21,6 +21,8 @@ mkdir -p "$STAGE"
 
 # Sólo lo que el tema necesita en tiempo de ejecución.
 cp -R "$ROOT/assets" "$ROOT/inc" "$STAGE/"
+# marca/ guarda el logo a 512 px, que es para subir al Customizer y no algo
+# que el tema cargue nunca. Medio mega dentro del zip sólo alarga la subida.
 cp "$ROOT/style.css" "$ROOT/functions.php" "$STAGE/"
 [ -f "$ROOT/screenshot.png" ] && cp "$ROOT/screenshot.png" "$STAGE/"
 

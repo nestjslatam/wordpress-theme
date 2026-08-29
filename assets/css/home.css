@@ -328,3 +328,131 @@
   width: 100%;
   margin-bottom: var(--nl-space-4);
 }
+
+/* Guías: pasos numerados y salida de terminal ---------------------------- */
+
+.nl-steps { counter-reset: paso; margin: var(--nl-space-12) 0; }
+
+.nl-step {
+  position: relative;
+  padding-left: 3.5rem;
+  padding-bottom: var(--nl-space-12);
+  border-left: 1px solid var(--nl-border-soft);
+  margin-left: 1.15rem;
+}
+.nl-step:last-child { border-left-color: transparent; padding-bottom: 0; }
+
+.nl-step::before {
+  counter-increment: paso;
+  content: counter(paso);
+  position: absolute;
+  left: -1.15rem;
+  top: 0;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: var(--nl-radius-full);
+  display: grid;
+  place-items: center;
+  font-family: var(--nl-font-mono);
+  font-size: var(--nl-text-sm);
+  font-weight: 600;
+  color: var(--nl-red-soft);
+  background: var(--nl-bg-solid);
+  border: 1px solid color-mix(in srgb, var(--nl-red) 45%, transparent);
+}
+
+.nl-step__title {
+  font-size: var(--nl-text-lg);
+  font-weight: 600;
+  margin: 0.25rem 0 var(--nl-space-3);
+  border: 0;
+  padding: 0;
+  letter-spacing: -0.015em;
+}
+.nl-step p { margin-bottom: var(--nl-space-4); }
+.nl-step pre { margin-block: var(--nl-space-4); }
+
+/* Salida de terminal: se distingue del código fuente para que se lea como
+   "esto es lo que verás", y no como "esto es lo que escribes". */
+.nl-term {
+  background: var(--nl-bg-solid);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius);
+  overflow: hidden;
+  margin: var(--nl-space-6) 0;
+}
+.nl-term__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--nl-space-3) var(--nl-space-4);
+  border-bottom: 1px solid var(--nl-border-soft);
+  font-family: var(--nl-font-mono);
+  font-size: var(--nl-text-xs);
+  color: var(--nl-text-faint);
+}
+.nl-term__dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--nl-border);
+  flex-shrink: 0;
+}
+.nl-term__dot:first-child { background: color-mix(in srgb, var(--nl-danger) 70%, transparent); }
+.nl-term__title { margin-left: var(--nl-space-3); }
+.nl-term pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: var(--nl-text-xs);
+  line-height: 1.75;
+}
+
+/* Tabla de comandos, más aireada que una tabla normal. */
+.nl-cmds { display: grid; gap: var(--nl-space-3); margin: var(--nl-space-8) 0; }
+.nl-cmd {
+  display: grid;
+  gap: var(--nl-space-2);
+  padding: var(--nl-space-4) var(--nl-space-6);
+  border: 1px solid var(--nl-border-soft);
+  border-radius: var(--nl-radius);
+  background: var(--nl-bg-subtle);
+  transition: border-color var(--nl-transition), background var(--nl-transition);
+}
+.nl-cmd:hover { border-color: var(--nl-border); background: var(--nl-bg-sunken); }
+@media (min-width: 760px) {
+  .nl-cmd { grid-template-columns: 15rem 1fr; align-items: baseline; gap: var(--nl-space-6); }
+}
+.nl-cmd__name {
+  font-family: var(--nl-font-mono);
+  font-size: var(--nl-text-sm);
+  color: var(--nl-code-inline-text);
+  font-weight: 500;
+}
+.nl-cmd__what { font-size: var(--nl-text-sm); color: var(--nl-text-muted); margin: 0; }
+.nl-cmd__what strong { color: var(--nl-text); }
+
+/* Índice lateral de una guía larga. */
+.nl-toc-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nl-space-2);
+  padding: var(--nl-space-4) 0 var(--nl-space-8);
+  border-bottom: 1px solid var(--nl-border-soft);
+  margin-bottom: var(--nl-space-8);
+}
+.nl-toc-inline a {
+  font-size: var(--nl-text-xs);
+  font-weight: 600;
+  padding: 0.35em 0.9em;
+  border-radius: var(--nl-radius-full);
+  background: var(--nl-bg-subtle);
+  border: 1px solid var(--nl-border-soft);
+  color: var(--nl-text-muted);
+  text-decoration: none;
+  transition: all var(--nl-transition);
+}
+.nl-toc-inline a:hover {
+  color: var(--nl-text);
+  border-color: var(--nl-border);
+  background: var(--nl-bg-sunken);
+}

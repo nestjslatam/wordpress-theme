@@ -120,13 +120,21 @@ function nestjslatam_favicon() {
 		return;
 	}
 
+	$base = get_stylesheet_directory_uri() . '/assets/img/';
+
 	printf(
-		'<link rel="icon" href="%s" type="image/svg+xml">' . "\n",
-		esc_url( get_stylesheet_directory_uri() . '/assets/img/logo.svg' )
+		'<link rel="icon" href="%1$s" sizes="32x32">' . "\n"
+			. '<link rel="icon" href="%2$s" sizes="192x192">' . "\n"
+			. '<link rel="apple-touch-icon" href="%3$s">' . "\n",
+		esc_url( $base . 'logo-32.png' ),
+		esc_url( $base . 'logo-192.png' ),
+		esc_url( $base . 'logo-192.png' )
 	);
 }
 add_action( 'wp_head', 'nestjslatam_favicon', 5 );
 
 require_once get_stylesheet_directory() . '/inc/header.php';
+require_once get_stylesheet_directory() . '/inc/auth.php';
+require_once get_stylesheet_directory() . '/inc/footer.php';
 require_once get_stylesheet_directory() . '/inc/patterns.php';
 require_once get_stylesheet_directory() . '/inc/setup.php';

@@ -65,11 +65,14 @@ def slugificar(texto: str) -> str:
 PAGINAS = [
     ('Inicio',        'inicio',        'portada.html',      0),
     ('Documentación', 'documentacion', 'documentacion.html', 1),
-    ('Guías',         'guias',         'guias.html',        2),
-    ('Comunidad',     'comunidad',     'comunidad.html',    3),
+    ('Guías',            'guias',         'guias.html',        2),
+    ('Guía de ddd-lib',  'guia-ddd-lib',  'guia-ddd.html',     3),
+    ('Guía del CLI',     'guia-cli',      'guia-cli.html',     4),
+    ('Acceso',           'acceso',        'acceso.html',       9),
+    ('Comunidad',        'comunidad',     'comunidad.html',    5),
     # El blog va vacío a propósito: WordPress lo rellena al designarlo como
     # "página de entradas" en Ajustes -> Lectura.
-    ('Blog',          'blog',          None,                4),
+    ('Blog',             'blog',          None,                6),
 ]
 
 ARTICULOS = [
@@ -107,7 +110,9 @@ YA_EXISTEN = {'about', 'contact'}
 MENU = [
     ('Inicio',            f'{DOMINIO}/inicio/',                                        None),
     ('Documentación',     f'{DOMINIO}/documentacion/',                                 None),
-    ('Guía de ddd-lib',   'https://docs.nestjslatam.dev/guia/',                        'Documentación'),
+    ('Guía de ddd-lib',   f'{DOMINIO}/guia-ddd-lib/',                                  'Documentación'),
+    ('Guía del CLI',      f'{DOMINIO}/guia-cli/',                                      'Documentación'),
+    ('Referencia online', 'https://docs.nestjslatam.dev',                              'Documentación'),
     ('Referencia de API', 'https://docs.nestjslatam.dev/guia/api',                     'Documentación'),
     ('Value objects',     'https://docs.nestjslatam.dev/valueobjects/',                'Documentación'),
     ('Event sourcing',    'https://docs.nestjslatam.dev/event-sourcing/',              'Documentación'),
@@ -116,8 +121,8 @@ MENU = [
     ('Probar un agregado', f'{DOMINIO}/como-probar-un-agregado/',                      'Guías y How-To'),
     ('Modelar dinero',    f'{DOMINIO}/como-modelar-dinero-sin-equivocarte/',           'Guías y How-To'),
     ('Migrar a la 4.0.0', f'{DOMINIO}/como-migrar-de-ddd-lib-3-a-4/',                  'Guías y How-To'),
-    ('CLI',               'https://docs.nestjslatam.dev/cli/',                         None),
-    ('Guía completa del CLI', 'https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md', 'CLI'),
+    ('CLI',               f'{DOMINIO}/guia-cli/',                                      None),
+    ('Guía extendida',    'https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md', 'CLI'),
     ('Servidor MCP',      'https://docs.nestjslatam.dev/cli/mcp',                      'CLI'),
     ('Conectarlo a tu agente', f'{DOMINIO}/como-conectar-el-cli-a-tu-agente-por-mcp/', 'CLI'),
     ('Blog',              f'{DOMINIO}/blog/',                                          None),

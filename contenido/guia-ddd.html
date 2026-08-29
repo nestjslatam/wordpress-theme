@@ -1,0 +1,152 @@
+<!-- wp:html -->
+<section class="nl-hero" style="padding:5rem 1.5rem">
+  <span class="nl-hero__eyebrow">@nestjslatam/ddd-lib</span>
+  <h1 class="nl-hero__title" style="font-size:clamp(2rem,5vw,3rem)">La guía de <em>ddd-lib</em></h1>
+  <p class="nl-hero__lead">Agregados que acumulan <strong>todas</strong> sus reglas rotas, value objects que se validan solos y seguimiento de estado. Sobre <code>@nestjs/cqrs</code>, sin framework encima.</p>
+  <div class="nl-hero__actions">
+    <a class="nl-btn" href="#empezar">Empezar</a>
+    <a class="nl-btn nl-btn--ghost" href="https://docs.nestjslatam.dev/guia/">Documentación completa</a>
+  </div>
+</section>
+
+<div class="nl-toc-inline">
+  <a href="#empezar">Instalar</a>
+  <a href="#idea">La idea</a>
+  <a href="#vo">Value objects</a>
+  <a href="#agregado">Agregados</a>
+  <a href="#eventos">Eventos</a>
+  <a href="#errores">Errores HTTP</a>
+  <a href="#trampas">Las trampas</a>
+</div>
+
+<section class="nl-section" id="empezar" style="padding-top:0">
+  <div class="nl-steps">
+
+    <div class="nl-step">
+      <h3 class="nl-step__title">Instalar</h3>
+      <pre><code>npm i @nestjslatam/ddd-lib@4.0.0 @nestjs/cqrs</code></pre>
+      <p><code>@nestjs/cqrs</code> no es opcional: <code>DddAggregateRoot</code> extiende su <code>AggregateRoot</code>. Es dependencia par, así que la instalas tú y no acabas con dos copias distintas en el árbol.</p>
+      <div class="nl-note nl-note--warn">
+        <p class="nl-note__title">Sin acento circunflejo</p>
+        <p>La API ha roto entre versiones mayores y el compilador no detecta la mayoría de los cambios. Clavar la versión exacta es lo que te deja actualizar cuando <strong>tú</strong> lo decidas y no cuando alguien publique.</p>
+      </div>
+    </div>
+
+    <div class="nl-step" id="idea">
+      <h3 class="nl-step__title">La idea que lo organiza todo</h3>
+      <p>La mayoría de las librerías de validación lanzan en el primer problema. Ésta <strong>no</strong>: recolecta.</p>
+      <pre><code>const product = new Product({ name, description, price });
+
+product.isValid;                        // false
+product.brokenRules.getBrokenRules();   // las TRES, no la primera</code></pre>
+      <p>Eso cambia lo que le devuelves a quien llama. En vez de «el precio es inválido» —y que lo arregle, lo reenvíe y descubra que el nombre también lo era— le mandas las tres de golpe, con el campo de cada una nombrado.</p>
+      <p><strong>La contrapartida es que tú tienes que preguntar.</strong> Como la validación no lanza, una fábrica que no comprueba <code>isValid</code> devuelve tan tranquila un objeto que incumple sus propias invariantes.</p>
+    </div>
+
+    <div class="nl-step" id="vo">
+      <h3 class="nl-step__title">Un value object</h3>
+      <pre><code>export class Name extends StringValueObject {
+  static create(value: string): Name {
+    const name = new Name(value);
+
+    if (!name.isValid) {                          // ← imprescindible
+      throw new BrokenRulesException('Name', name.brokenRules.getBrokenRules());
+    }
+
+    return name;
+  }
+
+  override addValidators(): void {
+    super.addValidators();                        // ← imprescindible
+    this.validatorRules.add(new NameLengthValidator(this));
+  }
+}</code></pre>
+      <p>Las dos líneas marcadas son el 80 % de los fallos al empezar, y <strong>ninguna produce un error si falta</strong>. Sin la primera, entran objetos inválidos en silencio. Sin la segunda, los validadores de la clase base desaparecen y <code>''</code> pasa a ser un nombre válido.</p>
+      <p>Bases disponibles: <code>StringValueObject</code>, <code>NumberValueObject</code>, <code>DateValueObject</code>, <code>BooleanValueObject</code>, <code>IdValueObject</code>, <code>DddEnum</code> y <code>DddValueObject&lt;T&gt;</code> para los compuestos.</p>
+    </div>
+
+    <div class="nl-step" id="agregado">
+      <h3 class="nl-step__title">Un agregado</h3>
+      <pre><code>export class Product extends DddAggregateRoot&lt;Product, IProductProps&gt; {
+  private constructor(props: IProductProps, id?: IdValueObject) {
+    super(props, { id });              // el id va en la BOLSA DE OPCIONES
+    this.trackingState.markAsNew();
+  }
+
+  static create(name: Name, description: Description, price: Price): Product {
+    const product = new Product({ name, description, price, status: ProductStatus.ACTIVE });
+
+    if (!product.isValid) {
+      throw new BrokenRulesException('Product', product.brokenRules.getBrokenRules());
+    }
+
+    product.apply(new ProductCreatedEvent(product.id.getValue()));
+    return product;
+  }
+}</code></pre>
+      <p>Tres detalles que cuestan una tarde: <strong>dos argumentos de tipo</strong>, <strong>el id dentro de <code>{ id }</code></strong>, y <strong><code>markAsNew()</code> lo llamas tú</strong> — el seguimiento de estado no adivina, y es lo que después permite al repositorio elegir entre insertar y actualizar.</p>
+      <p>Junto a <code>create()</code> va <code>load()</code>, que <strong>no valida</strong> a propósito: rehidratar algo que ya está guardado no es lo mismo que crearlo. Si <code>load()</code> validara, endurecer una regla convertiría tus filas históricas en datos que no se pueden ni abrir para migrarlos.</p>
+    </div>
+
+    <div class="nl-step">
+      <h3 class="nl-step__title">Una regla que sólo el agregado puede ver</h3>
+      <pre><code>export class ProductBusinessRulesValidator extends AbstractRuleValidator&lt;Product&gt; {
+  public addRules(): void {
+    const { name, description } = this.subject.props;
+
+    // OJO: la condición es verdadera cuando la regla está ROTA.
+    if (description.getValue().length &lt;= name.getValue().length) {
+      this.addBrokenRule('props.description', 'La descripción debe ser más larga que el nombre');
+    }
+  }
+}</code></pre>
+      <p>Aquí es donde el patrón paga. <code>name</code> es válido. <code>description</code> es válida. La <strong>combinación</strong> no lo es, y ningún value object puede saberlo porque ninguno ve al otro. Para eso existe la raíz de agregado.</p>
+    </div>
+
+    <div class="nl-step" id="eventos">
+      <h3 class="nl-step__title">Eventos de dominio</h3>
+      <pre><code>await this.repository.save(product);                  // 1. persistir
+this.publisher.mergeObjectContext(product).commit();  // 2. despachar</code></pre>
+      <p><code>apply()</code> <strong>no despacha nada</strong>: añade el evento a una lista del agregado. Sólo <code>commit()</code> lo entrega al bus.</p>
+      <div class="nl-note nl-note--danger">
+        <p class="nl-note__title">La línea que se olvida</p>
+        <p>Si falta <code>commit()</code>, el comando <strong>se ejecuta con éxito</strong>, devuelve su respuesta, no lanza ningún error… y todos tus <code>@EventsHandler</code> se saltan en silencio. El correo de confirmación simplemente no se envía, y lo descubres tres días después.</p>
+      </div>
+      <p>Y el orden importa: publicar antes de guardar abre una ventana en la que un manejador lee algo que todavía no existe.</p>
+    </div>
+
+    <div class="nl-step" id="errores">
+      <h3 class="nl-step__title">Traducir el dominio a HTTP</h3>
+      <div class="nl-cmds">
+        <div class="nl-cmd"><span class="nl-cmd__name">400 · estructura</span><p class="nl-cmd__what">Falta un campo o es del tipo equivocado. Lo rechaza el <code>ValidationPipe</code> <strong>antes de que el dominio lo vea</strong>.</p></div>
+        <div class="nl-cmd"><span class="nl-cmd__name">422 · significado</span><p class="nl-cmd__what">El cuerpo está bien formado y el agregado lo rechaza. <code>price: 0</code> es un número válido; que no pueda ser un precio es conocimiento de negocio.</p></div>
+        <div class="nl-cmd"><span class="nl-cmd__name">409 · estado</span><p class="nl-cmd__what">Nada está mal formado y ningún valor es inválido: el agregado no está en un estado que permita la operación.</p></div>
+        <div class="nl-cmd"><span class="nl-cmd__name">500 · un fallo de verdad</span><p class="nl-cmd__what">Todo lo que no sea una excepción de dominio se deja como 500. <strong>Un <code>TypeError</code> disfrazado de 400 es un bug que nadie va a investigar.</strong></p></div>
+      </div>
+      <p><a href="/estructura-contra-significado-por-que-400-422-y-409-no-son-lo-mismo/">La distinción, desarrollada →</a></p>
+    </div>
+
+    <div class="nl-step" id="trampas">
+      <h3 class="nl-step__title">Las cuatro trampas</h3>
+      <p>Las cuatro compilan, las cuatro pasan los tests, y <code>npx ddd validate</code> las detecta todas.</p>
+      <div class="nl-cmds">
+        <div class="nl-cmd"><span class="nl-cmd__name">Fábrica sin <code>isValid</code></span><p class="nl-cmd__what">Devuelve objetos inválidos. <strong>Sin síntoma</strong> hasta que aparecen como datos imposibles en un informe.</p></div>
+        <div class="nl-cmd"><span class="nl-cmd__name">Sin <code>super.addValidators()</code></span><p class="nl-cmd__what">Los validadores de la base desaparecen. <strong>Sin síntoma.</strong></p></div>
+        <div class="nl-cmd"><span class="nl-cmd__name">Campo propio en <code>addValidators()</code></span><p class="nl-cmd__what">El constructor base lo llama <strong>antes</strong> que el tuyo, así que el campo es <code>undefined</code>. Revienta en cada construcción.</p></div>
+        <div class="nl-cmd"><span class="nl-cmd__name">Handler sin <code>commit()</code></span><p class="nl-cmd__what">Ningún evento se despacha. <strong>Sin síntoma.</strong></p></div>
+      </div>
+      <p><a href="/la-trampa-del-orden-de-construccion/">Por qué la tercera revienta siempre →</a></p>
+    </div>
+
+  </div>
+</section>
+
+<section class="nl-cta">
+  <h2 class="nl-cta__title">Seguir por aquí</h2>
+  <p class="nl-cta__lead">La referencia completa —cada clase, cada método, cada código de estado— vive junto al código, versionada con él.</p>
+  <div class="nl-hero__actions">
+    <a class="nl-btn" href="https://docs.nestjslatam.dev/guia/">Documentación de ddd-lib</a>
+    <a class="nl-btn nl-btn--ghost" href="/como-montar-tu-primer-agregado-paso-a-paso/">El How-To paso a paso</a>
+  </div>
+</section>
+<!-- /wp:html -->

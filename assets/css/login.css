@@ -1,0 +1,129 @@
+/* La pantalla de wp-login.php, con la identidad del sitio. */
+
+body.login {
+  background: var(--nl-bg);
+  color: var(--nl-text);
+  font-family: var(--nl-font);
+}
+
+/* El logo: la marca del sitio en lugar del de WordPress. */
+body.login h1 a {
+  background-image: url('../img/logo-96.png');
+  background-size: 76px 76px;
+  width: 76px;
+  height: 76px;
+  margin-bottom: var(--nl-space-6);
+}
+
+.login form {
+  background: var(--nl-bg-subtle);
+  border: 1px solid var(--nl-border-soft);
+  border-radius: var(--nl-radius-lg);
+  box-shadow: none;
+  padding: var(--nl-space-8);
+}
+
+.login label { color: var(--nl-text-muted); font-size: var(--nl-text-sm); }
+
+.login input[type='text'],
+.login input[type='password'],
+.login input[type='email'] {
+  background: var(--nl-bg-solid);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius);
+  color: var(--nl-text);
+  padding: 0.6em 0.8em;
+  box-shadow: none;
+}
+.login input[type='text']:focus,
+.login input[type='password']:focus,
+.login input[type='email']:focus {
+  border-color: var(--nl-red);
+  box-shadow: 0 0 0 1px var(--nl-red);
+  outline: 2px solid transparent;   /* el anillo lo pinta el box-shadow */
+}
+
+.login .button-primary {
+  background: var(--nl-text) !important;   /* gana al CSS del núcleo */
+  border-color: var(--nl-text) !important;
+  color: var(--nl-text-invert) !important;
+  border-radius: var(--nl-radius-btn) !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  font-weight: var(--nl-weight-strong);
+  padding: 0.4em 1.4em !important;
+  height: auto !important;
+  line-height: 1.9 !important;
+}
+.login .button-primary:hover { opacity: .9; }
+
+.login #nav a,
+.login #backtoblog a,
+.login .privacy-policy-link {
+  color: var(--nl-text-muted) !important;
+  font-size: var(--nl-text-xs);
+}
+.login #nav a:hover,
+.login #backtoblog a:hover { color: var(--nl-red-soft) !important; }
+
+.login .message,
+.login #login_error {
+  background: var(--nl-bg-subtle);
+  border-left: 3px solid var(--nl-red);
+  border-radius: var(--nl-radius);
+  color: var(--nl-text-muted);
+  box-shadow: none;
+}
+.login .message { border-left-color: var(--nl-ok); }
+
+/* El atajo [nl_acceso], dentro de una página normal ----------------------- */
+
+.nl-auth {
+  display: grid;
+  gap: var(--nl-space-6);
+  margin: var(--nl-space-12) 0;
+}
+@media (min-width: 780px) { .nl-auth { grid-template-columns: 1fr 1fr; } }
+.nl-auth--in { display: block; max-width: 30rem; }
+
+.nl-auth__panel {
+  padding: var(--nl-space-8);
+  border: 1px solid var(--nl-border-soft);
+  border-radius: var(--nl-radius-lg);
+  background: var(--nl-bg-subtle);
+}
+.nl-auth__title {
+  font-size: var(--nl-text-xl);
+  font-weight: 600;
+  margin: 0 0 var(--nl-space-4);
+  border: 0;
+  padding: 0;
+}
+.nl-auth__note  { color: var(--nl-text-muted); font-size: var(--nl-text-sm); }
+.nl-auth__hi    { font-size: var(--nl-text-lg); margin-bottom: var(--nl-space-2); }
+.nl-auth__aside { font-size: var(--nl-text-xs); margin: var(--nl-space-4) 0 0; }
+.nl-auth__aside a { color: var(--nl-text-muted); text-decoration: none; }
+.nl-auth__aside a:hover { color: var(--nl-red-soft); }
+
+.nl-auth .login-username,
+.nl-auth .login-password { margin-bottom: var(--nl-space-4); }
+.nl-auth label { display: block; font-size: var(--nl-text-sm); color: var(--nl-text-muted); margin-bottom: var(--nl-space-2); }
+.nl-auth input[type='text'],
+.nl-auth input[type='password'] {
+  width: 100%;
+  background: var(--nl-bg-solid);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius);
+  color: var(--nl-text);
+  padding: 0.7em 1em;
+}
+.nl-auth .login-remember label { display: flex; align-items: center; gap: var(--nl-space-2); }
+.nl-auth .login-submit input {
+  background: var(--nl-text);
+  color: var(--nl-text-invert);
+  border: 0;
+  border-radius: var(--nl-radius-btn);
+  font-weight: var(--nl-weight-strong);
+  padding: 0.8em 1.7em;
+  cursor: pointer;
+}
