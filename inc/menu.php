@@ -33,7 +33,11 @@ function nestjslatam_menu_fallback() {
 		),
 		array(
 			'texto' => __( 'Documentación', 'nestjslatam' ),
-			'url'   => 'https://docs.nestjslatam.dev',
+			// Apunta a la página del portal y no a docs.nestjslatam.dev: había
+			// dos destinos distintos con el mismo nombre, y el visitante no
+			// tenía forma de saber cuál le tocaba. La página es el índice y
+			// desde ahí se sale a la referencia.
+			'url'   => home_url( '/documentacion/' ),
 			'hijos' => array(
 				array( 'texto' => __( 'ddd-lib', 'nestjslatam' ),        'url' => 'https://docs.nestjslatam.dev/guia/' ),
 				array( 'texto' => __( 'CLI y MCP', 'nestjslatam' ),      'url' => 'https://docs.nestjslatam.dev/cli/' ),
@@ -119,7 +123,11 @@ function nestjslatam_completar_menu( $items, $args ) {
 		),
 		array(
 			'texto' => __( 'Documentación', 'nestjslatam' ),
-			'url'   => 'https://docs.nestjslatam.dev',
+			// Apunta a la página del portal y no a docs.nestjslatam.dev: había
+			// dos destinos distintos con el mismo nombre, y el visitante no
+			// tenía forma de saber cuál le tocaba. La página es el índice y
+			// desde ahí se sale a la referencia.
+			'url'   => home_url( '/documentacion/' ),
 			'hijos' => array(
 				array( 'texto' => __( 'ddd-lib', 'nestjslatam' ),           'url' => 'https://docs.nestjslatam.dev/guia/' ),
 				array( 'texto' => __( 'CLI y servidor MCP', 'nestjslatam' ), 'url' => 'https://docs.nestjslatam.dev/cli/' ),

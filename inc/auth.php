@@ -198,6 +198,7 @@ function nestjslatam_header_actions() {
 	<?php
 }
 add_action( 'generate_menu_bar_items', 'nestjslatam_header_actions', 5 );
+// La cuenta va justo detrás (prioridad 10) para que compartan cápsula.
 
 function nestjslatam_header_account() {
 	if ( ! is_user_logged_in() ) {

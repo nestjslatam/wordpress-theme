@@ -69,6 +69,7 @@ PAGINAS = [
     ('Guía de ddd-lib',  'guia-ddd-lib',  'guia-ddd.html',     3),
     ('Guía del CLI',     'guia-cli',      'guia-cli.html',     4),
     ('Acceso',           'acceso',        'acceso.html',       9),
+    ('Aviso legal',      'aviso-legal',   'aviso-legal.html', 10),
     ('Comunidad',        'comunidad',     'comunidad.html',    5),
     # El blog va vacío a propósito: WordPress lo rellena al designarlo como
     # "página de entradas" en Ajustes -> Lectura.
@@ -112,7 +113,7 @@ MENU = [
     ('Documentación',     f'{DOMINIO}/documentacion/',                                 None),
     ('Guía de ddd-lib',   f'{DOMINIO}/guia-ddd-lib/',                                  'Documentación'),
     ('Guía del CLI',      f'{DOMINIO}/guia-cli/',                                      'Documentación'),
-    ('Referencia online', 'https://docs.nestjslatam.dev',                              'Documentación'),
+    ('Referencia completa','https://docs.nestjslatam.dev',                             'Documentación'),
     ('Referencia de API', 'https://docs.nestjslatam.dev/guia/api',                     'Documentación'),
     ('Value objects',     'https://docs.nestjslatam.dev/valueobjects/',                'Documentación'),
     ('Event sourcing',    'https://docs.nestjslatam.dev/event-sourcing/',              'Documentación'),

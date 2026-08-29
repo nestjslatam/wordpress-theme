@@ -604,14 +604,15 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
   display: inline-block;
   font-size: var(--nl-text-sm);
   font-weight: 600;
-  padding: 0.45em 1.15em;
+  padding: 0.42em 1.15em;
   border-radius: var(--nl-radius-full);
-  border: 1px solid var(--nl-border);
-  color: var(--nl-text);
+  border: 0;
+  background: var(--nl-text);
+  color: var(--nl-text-invert);
   text-decoration: none;
-  transition: background var(--nl-transition), border-color var(--nl-transition);
+  transition: opacity var(--nl-transition), transform var(--nl-transition);
 }
-.nl-account__in:hover { background: var(--nl-bg-subtle); border-color: var(--nl-text-faint); color: var(--nl-text); }
+.nl-account__in:hover { opacity: .9; transform: translateY(-1px); color: var(--nl-text-invert); }
 
 .nl-account__btn {
   display: flex;
@@ -711,62 +712,87 @@ input::placeholder, textarea::placeholder { color: var(--nl-text-faint); }
   .nl-account__name { display: none; }
 }
 
-/* Acciones de la barra de navegación ------------------------------------- */
+/* Acciones de la barra de navegación -------------------------------------
+
+   GitHub y la cuenta se agrupan en una sola cápsula en vez de flotar sueltos
+   al final de la fila. Leen como un bloque de sesión, que es lo que son. */
 
 .nl-actions {
   display: flex;
   align-items: center;
-  gap: var(--nl-space-2);
   margin-left: auto;
-}
-
-.nl-actions__link {
-  font-size: var(--nl-text-sm);
-  font-weight: 500;
-  color: var(--nl-text-muted);
-  text-decoration: none;
-  padding: 0.45em 0.75em;
-  border-radius: var(--nl-radius);
-  transition: color var(--nl-transition), background var(--nl-transition);
-}
-.nl-actions__link:hover { color: var(--nl-text); background: var(--nl-bg-subtle); }
-
-/* El destino principal del sitio va marcado, pero en fantasma: un botón
-   sólido aquí competiría con las llamadas a la acción del contenido. */
-.nl-actions__docs {
-  font-size: var(--nl-text-sm);
-  font-weight: 600;
-  color: var(--nl-text);
-  text-decoration: none;
-  padding: 0.45em 1.05em;
+  padding: 3px;
   border-radius: var(--nl-radius-full);
-  border: 1px solid var(--nl-border);
+  border: 1px solid var(--nl-border-soft);
   background: var(--nl-bg-subtle);
-  transition: all var(--nl-transition);
-  white-space: nowrap;
-}
-.nl-actions__docs:hover {
-  color: var(--nl-text);
-  border-color: color-mix(in srgb, var(--nl-red) 55%, transparent);
-  background: color-mix(in srgb, var(--nl-red) 12%, transparent);
 }
 
 .nl-actions__gh {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--nl-radius-full);
   color: var(--nl-text-muted);
   transition: color var(--nl-transition), background var(--nl-transition);
 }
-.nl-actions__gh:hover { color: var(--nl-text); background: var(--nl-bg-subtle); }
+.nl-actions__gh:hover { color: var(--nl-text); background: var(--nl-bg-sunken); }
 
-/* Debajo de 900 px sobran los textos: el icono y la cuenta bastan, y el
-   menú desplegable ya lleva los mismos destinos. */
-@media (max-width: 900px) {
-  .nl-actions__link,
-  .nl-actions__docs { display: none; }
+
+/* La cuenta comparte la cápsula con GitHub: sin margen y con el borde
+   izquierdo como única separación. */
+.nl-account { margin-left: 0; padding-left: 3px; }
+.nl-actions + .nl-account { margin-left: -3px; }
+
+/* Atribución a NestJS y descargo ----------------------------------------- */
+
+.nl-footer__nest {
+  padding: var(--nl-space-6) 0;
+  border-top: 1px solid var(--nl-border-soft);
+  text-align: left;
 }
 
-.nl-account { margin-left: var(--nl-space-2); }
+.nl-nest {
+  display: flex;
+  align-items: center;
+  gap: var(--nl-space-3);
+  margin-bottom: var(--nl-space-4);
+}
+.nl-nest__mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--nl-radius);
+  border: 1px solid var(--nl-border-soft);
+  background: var(--nl-bg-subtle);
+  color: var(--nl-red-soft);
+}
+.nl-nest__text {
+  margin: 0;
+  font-size: var(--nl-text-sm);
+  color: var(--nl-text-muted);
+  line-height: 1.6;
+}
+.nl-nest__text strong { color: var(--nl-text); }
+.nl-nest__text a { color: var(--nl-text-muted); text-decoration: none; }
+.nl-nest__text a:hover { color: var(--nl-red-soft); }
+
+/* El descargo va en un bloque aparte y legible: es información legal, no
+   pie de página decorativo, y esconderlo en 10 px lo haría inútil. */
+.nl-disclaimer {
+  margin: 0;
+  padding: var(--nl-space-4) var(--nl-space-5, 1.25rem);
+  border-radius: var(--nl-radius);
+  border: 1px solid var(--nl-border-soft);
+  border-left: 3px solid var(--nl-gold);
+  background: var(--nl-bg-subtle);
+  font-size: var(--nl-text-xs);
+  line-height: 1.65;
+  color: var(--nl-text-muted);
+  max-width: 62rem;
+}
+.nl-disclaimer strong { color: var(--nl-text); }
+.nl-disclaimer a { color: var(--nl-red-soft); text-decoration: none; }
+.nl-disclaimer a:hover { text-decoration: underline; }

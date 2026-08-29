@@ -67,12 +67,42 @@ function nestjslatam_footer( $copyright ) {
 
 		</div>
 
+		<div class="nl-footer__nest">
+			<div class="nl-nest">
+				<span class="nl-nest__mark" aria-hidden="true">
+					<svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+						<path d="M12 2.2 21 7.3v9.4L12 21.8 3 16.7V7.3L12 2.2Z"
+						      stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+						<path d="M8.6 9.2v5.6M8.6 9.2l6.8 5.6M15.4 9.2v5.6"
+						      stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+					</svg>
+				</span>
+				<p class="nl-nest__text">
+					Construido sobre <a href="https://nestjs.com/"><strong>NestJS</strong></a>,
+					creado por <a href="https://github.com/kamilmysliwiec">Kamil&nbsp;Myśliwiec</a>
+					y publicado bajo licencia MIT.
+					<a href="https://docs.nestjs.com/">Documentación oficial</a> ·
+					<a href="https://github.com/nestjs/nest">Repositorio</a>
+				</p>
+			</div>
+
+			<p class="nl-disclaimer">
+				<strong>Proyecto de comunidad, no oficial.</strong>
+				NestJS Latam no está afiliado, asociado, autorizado ni respaldado por NestJS
+				ni por sus autores. «NestJS» y su logotipo pertenecen a sus respectivos
+				titulares y se mencionan aquí únicamente para identificar la tecnología
+				sobre la que trabajamos.
+				<a href="<?php echo esc_url( home_url( '/aviso-legal/' ) ); ?>">Aviso legal completo</a>
+			</p>
+		</div>
+
 		<div class="nl-footer__bar">
 			<p class="nl-footer__legal">
 				© <?php echo esc_html( $anio ); ?>
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></a>
 				· Contenido y código bajo licencia
 				<a href="https://opensource.org/licenses/MIT" rel="license">MIT</a>
+				· <a href="<?php echo esc_url( home_url( '/aviso-legal/' ) ); ?>">Aviso legal</a>
 			</p>
 			<p class="nl-footer__by">
 				Powered by <a href="https://beyondnet.info/"><strong>BeyondNetCode</strong></a>
