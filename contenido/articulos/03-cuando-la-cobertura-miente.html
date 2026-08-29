@@ -1,0 +1,121 @@
+<!-- meta: cat=Ingeniería | tags=Testing,Jest,Cobertura | resumen=Un 98,6 % de cobertura convivía con un 8,5 % real. Cinco mecanismos lo tapaban a la vez, y ninguno era un bug. -->
+<!-- wp:paragraph -->
+<p><code>@nestjslatam/ddd-lib</code> reportaba <strong>98,6 % de cobertura</strong>. La cifra real era <strong>58,4 %</strong>, y en un módulo concreto, <strong>8,5 %</strong>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Ninguna de las dos cifras era mentira. Ambas salían de Jest, correctamente calculadas. La diferencia estaba en <em>qué se le pidió medir</em>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">1. El patrón excluía lo no probado</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>"collectCoverageFrom": ["src/**/*.ts", "!src/**/*.spec.ts"]</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Se ve inofensivo. El problema aparece cuando alguien añade un directorio <strong>fuera</strong> de <code>src/</code>. Los ficheros de <code>libs/ddd/src/</code> no encajaban con el patrón, así que no salían en el informe. No como 0 %: <strong>no aparecían</strong>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Un fichero sin cubrir baja la media. Un fichero ausente, no.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">2. Los globs no siguen <code>../</code></h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>"collectCoverageFrom": ["../libs/ddd/src/**/*.ts"]</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>No funciona, y sin decirlo. <code>collectCoverageFrom</code> resuelve contra <code>rootDir</code> y no atraviesa <code>../</code>. El patrón no casa con nada, <strong>Jest no avisa de que un patrón no casó con nada</strong>, y el informe sale idéntico.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">3. Clave de directorio vs. clave de glob</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>"coverageThreshold": {
+  "global": { "lines": 80 },
+  "./src/valueobjects/":        { "lines": 95 },  // AGREGA el directorio
+  "./src/valueobjects/**/*.ts": { "lines": 95 }   // se aplica a CADA fichero
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>La primera forma permite que un fichero al 20 % se esconda detrás de nueve al 99 %. La segunda no.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Y hay un efecto de segundo orden que casi nadie conoce: <strong>los ficheros que casan con una clave de ruta salen del cómputo de <code>global</code></strong>. Añadir un umbral estricto a un directorio bien probado <em>sube</em> el global de los demás, porque quita del promedio a los buenos. El número mejora justo cuando empeoras la vigilancia.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">4. La puerta de CI que se saltaba a sí misma</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>COVERAGE=$(node -p "require('./coverage/coverage-summary.json').total.lines.pct")
+if [ "$COVERAGE" -lt "$COVERAGE_THRESHOLD" ]; then exit 1; fi</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Si el fichero no existe, <code>node -p</code> escribe en stderr, <code>COVERAGE</code> queda vacío, y <code>[ "" -lt "80" ]</code> en bash no es un error de sintaxis: devuelve <strong>falso</strong>. La puerta pasa.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Un guardián que, cuando no encuentra la puerta, decide que está cerrada.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">5. El umbral que cambió de significado dos veces</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><code>COVERAGE_THRESHOLD</code> empezó valiendo 80 y refiriéndose a la librería. Se movió a un workflow donde medía la aplicación de ejemplo. Después a otro que medía ambas juntas. <strong>El nombre nunca cambió y el valor tampoco.</strong> El mismo 80 significaba «exigente», «laxo» y «trivial» según el mes.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Cómo se ve la verdad</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>npx jest --coverage --collectCoverageFrom='**/*.ts' --coverageReporters=text
+
+# y la comprobación que realmente cierra el asunto:
+node -p "Object.keys(require('./coverage/coverage-final.json')).length"</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Si esperabas 120 ficheros y salen 74, ya sabes por dónde empezar. <strong>El fallo casi nunca es un porcentaje bajo: es un fichero ausente.</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Y un sexto, de otro tipo</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>La capa de aplicación marcaba <strong>0 %</strong> y llevábamos tiempo tratándola como deuda. No lo era: diecisiete pruebas e2e la recorrían entera, pero escribían su informe en otro directorio y nadie los sumaba.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>const libCoverage = require('istanbul-lib-coverage');
+const map = libCoverage.createCoverageMap({});
+map.merge(require('./coverage/coverage-final.json'));
+map.merge(require('./coverage-e2e/coverage-final.json'));</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p><code>istanbul-lib-coverage</code> viene con Jest; no hay dependencia nueva. La cobertura real pasó de un 64 % aparente a un <strong>85,11 %</strong> medido. <strong>Un fichero está cubierto si un test lo recorre</strong>; cuál de los dos ejecutores lo hizo es un accidente de cómo repartiste las suites.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">El resultado</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<table>
+<tr><th></th><th>Antes</th><th>Después</th></tr>
+<tr><td>Cobertura de la librería</td><td>98,6 % <em>(declarada)</em> / 58,4 % <em>(real)</em></td><td><strong>98,76 %</strong> <em>(medida)</em></td></tr>
+<tr><td>Cobertura de la app</td><td>64 %</td><td><strong>85,11 %</strong></td></tr>
+<tr><td>Pruebas</td><td>308</td><td><strong>1111</strong></td></tr>
+<tr><td>Bugs encontrados al subirla</td><td>—</td><td><strong>34 confirmados</strong></td></tr>
+</table>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Esos 34 bugs llevaban ahí todo el tiempo. Lo único que cambió fue que alguien miró.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>El número que te tranquiliza suele ser el que no está midiendo lo que crees.</strong> Una cobertura alta responde a «de lo que decidí medir, ¿cuánto se ejecuta?». Nunca responde «¿decidí medir lo correcto?». Y esa segunda pregunta no te la va a hacer ninguna herramienta.</p>
+<!-- /wp:paragraph -->

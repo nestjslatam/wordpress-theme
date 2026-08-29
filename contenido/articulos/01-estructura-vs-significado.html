@@ -1,0 +1,82 @@
+<!-- meta: cat=Guías | tags=NestJS,DDD,API,HTTP | resumen=Por qué 400, 422 y 409 no son intercambiables, y cómo decidir cuál devolver sin pensarlo dos veces. -->
+<!-- wp:paragraph -->
+<p>Hay una decisión que se toma mal en casi todas las APIs que reviso, y no es de arquitectura ni de rendimiento: es qué código de estado devolver cuando algo va mal. La mayoría acaba en un <code>400</code> genérico para todo, o peor, en un <code>500</code> sin cuerpo.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>La distinción que lo resuelve cabe en una frase: <strong>un tipo equivocado es estructura; un valor equivocado es significado</strong>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Tres peticiones, tres respuestas</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>POST /products  {"name":"X","description":"Suficientemente larga","price":"cuarenta"}
+  → 400   el precio no es un número
+
+POST /products  {"name":"X","description":"Suficientemente larga","price":0}
+  → 422   es un número perfectamente válido, pero no puede ser un precio
+
+POST /orders/:id/confirm  {}
+  → 409   nada está mal formado; el pedido está vacío y no se puede confirmar</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Fíjate en la segunda. <code>0</code> es un número correcto en cualquier sentido técnico. Ningún validador de transporte puede saber que un precio no puede serlo, porque eso no es información sobre el formato: es conocimiento de negocio. Y el conocimiento de negocio vive en el dominio.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Quién juzga qué</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<table>
+<tr><th>Código</th><th>Significa</th><th>Lo decide</th></tr>
+<tr><td><strong>400</strong></td><td>Estructura: falta un campo o es del tipo equivocado</td><td>El <code>ValidationPipe</code>, antes de que el dominio vea nada</td></tr>
+<tr><td><strong>422</strong></td><td>Significado: el cuerpo está bien formado y el dominio lo rechaza</td><td>El agregado, con sus invariantes</td></tr>
+<tr><td><strong>409</strong></td><td>Estado: la operación no procede ahora mismo</td><td>El agregado, con su máquina de estados</td></tr>
+<tr><td><strong>500</strong></td><td>Un fallo de verdad</td><td>Nadie. Es un bug, y debe seguir siendo un 500</td></tr>
+</table>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Esa última fila importa más de lo que parece. La tentación al montar un filtro de excepciones es capturarlo todo y traducirlo a algo bonito. No lo hagas: <strong>un <code>TypeError</code> convertido en 400 es un bug de producción que nadie va a encontrar nunca</strong>, porque los 400 no se investigan — se asume que el cliente se equivocó.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Lo que gana el que llama</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Cuando el 422 lleva las reglas rotas estructuradas, un formulario puede resaltar los dos campos correctos a la vez:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>{
+  "statusCode": 422,
+  "error": "Unprocessable Entity",
+  "message": "Product is invalid",
+  "brokenRules": [
+    { "property": "props.price", "message": "Price must be greater than 0" },
+    { "property": "props.description", "message": "Description must be longer than the name" }
+  ]
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>El campo <code>property</code> es lo que hace la diferencia entre un aviso genérico arriba del formulario y dos campos marcados en rojo. Y para que llegue hasta ahí, el handler tiene que lanzar una excepción que <em>lleve</em> las reglas — no aplanarlas a texto:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>// mal: la estructura se pierde y ya no hay forma de recuperarla
+throw new Error(rules.map(r =&gt; r.message).join(', '));
+
+// bien: el filtro puede responder 422 y nombrar cada campo
+throw new BrokenRulesException('Product', product.brokenRules.getBrokenRules());</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Es un cambio de una línea que decide si tu API es utilizable desde un formulario o no.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<div class="nl-note">
+  <p class="nl-note__title">Para seguir</p>
+  <p>El mapeo completo, con el filtro de excepciones entero, está en <a href="https://docs.nestjslatam.dev/guia/errores-http">Mapear errores a HTTP</a>.</p>
+</div>
+<!-- /wp:html -->

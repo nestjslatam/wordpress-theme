@@ -1,0 +1,98 @@
+<!-- meta: cat=Guías | tags=TypeScript,DDD,Herencia | resumen=El constructor base llama a addValidators() antes de que corra el tuyo. Un validador que lea un campo propio revienta en cada construcción. -->
+<!-- wp:paragraph -->
+<p>Éste es el error que más rápido se detecta y más cuesta entender, porque el síntoma no señala a la causa. Y es el que la propia librería tuvo publicado durante dos versiones.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">El código</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>export class Price extends NumberValueObject {
+  private readonly max = 9_999_999.99;
+
+  override addValidators(): void {
+    super.addValidators();
+    this.validatorRules.add(new MaxValidator(this, this.max));  // ← undefined
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Revienta. En <strong>cada</strong> construcción, sin excepción.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">La causa: el orden real de ejecución</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Cuando escribes <code>new Price(49.99)</code>, JavaScript hace esto:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>1. Se ejecuta el constructor de la clase BASE
+2.   ...y dentro, la base llama a this.addValidators()
+3.   ...que resuelve a TU override, porque el despacho es dinámico
+4.   ...y ahí lees this.max, que todavía no existe        ← 💥
+5. Termina la base
+6. AHORA se inicializan los campos de tu subclase: this.max = 9999999.99
+7. Se ejecuta el cuerpo de tu constructor</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>El paso 3 es la clave y es contraintuitivo: <strong>un método sobrescrito se puede llamar antes de que tu clase esté construida</strong>. El despacho dinámico no espera a que tú estés listo.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Los inicializadores de campo (<code>private readonly max = ...</code>) se compilan a asignaciones que TypeScript coloca <em>después</em> de la llamada a <code>super()</code>. Así que en el paso 4, <code>this.max</code> es literalmente <code>undefined</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Las tres soluciones</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>// 1. Constante de módulo — la más simple
+const MAX_PRICE = 9_999_999.99;
+
+export class Price extends NumberValueObject {
+  override addValidators(): void {
+    super.addValidators();
+    this.validatorRules.add(new MaxValidator(this, MAX_PRICE));
+  }
+}
+
+// 2. static readonly — si el valor pertenece conceptualmente a la clase
+export class Price extends NumberValueObject {
+  static readonly MAX = 9_999_999.99;
+
+  override addValidators(): void {
+    super.addValidators();
+    this.validatorRules.add(new MaxValidator(this, Price.MAX));
+  }
+}
+
+// 3. El validador se lo sabe — si la regla es suya, no tuya
+export class MaxPriceValidator extends AbstractRuleValidator&lt;Price&gt; {
+  private static readonly MAX = 9_999_999.99;
+  // ...
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Por qué el compilador no ayuda</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Porque el tipo de <code>this.max</code> es <code>number</code>, y lo es. TypeScript no modela «este campo aún no está inicializado en este punto del ciclo de vida» — sólo modela «este campo existe y es de este tipo».</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Es la misma familia de problemas que las clases base que llaman a métodos virtuales en el constructor en C# o Java, donde el compilador tampoco avisa. La diferencia es que aquí lo hace una librería, no tu código, así que ni siquiera ves la llamada.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<div class="nl-note nl-note--warn">
+  <p class="nl-note__title">Se puede automatizar</p>
+  <p><code>npx ddd validate</code> tiene una regla para esto: <code>no-subclass-state-in-add-validators</code>. Es un predicado sobre el AST, corre en CI y no necesita ningún modelo. Los detalles están en <a href="https://docs.nestjslatam.dev/cli/">la documentación del CLI</a>.</p>
+</div>
+<!-- /wp:html -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">La regla que llevarte</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Si un método tuyo puede ser llamado por la clase base, trátalo como si corriera <strong>antes de que exista tu objeto</strong>. Sólo puede usar: sus argumentos, constantes de módulo, miembros estáticos y estado que la base ya haya inicializado. Nada más.</p>
+<!-- /wp:paragraph -->

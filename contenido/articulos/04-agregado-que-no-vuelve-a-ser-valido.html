@@ -1,0 +1,88 @@
+<!-- meta: cat=Ingeniería | tags=DDD,Bugs,Testing | resumen=Corregías el error, reenviabas el formulario, y recibías exactamente la misma respuesta. Faltaba una línea. -->
+<!-- wp:paragraph -->
+<p>De los 34 bugs que encontramos al escribir pruebas para <code>ddd-lib</code>, éste era el más grave y también el más corto de explicar.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">El síntoma</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Un usuario envía un formulario con el precio a <code>0</code>. Recibe, correctamente, la regla rota. Lo corrige, pone <code>49.99</code>, reenvía.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Y recibe <strong>exactamente la misma respuesta</strong>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">La causa</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>public validate(): void {
+  this._guardStrategy();
+  // ...ejecuta los validadores, que van llamando a addBrokenRule()
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Falta una línea. <code>validate()</code> <strong>sólo añadía</strong>. Nunca limpiaba. Cada pasada acumulaba sobre la anterior, así que un agregado que falló una vez arrastraba esa regla para siempre, aunque la condición que la produjo ya no se cumpliera.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>public validate(): void {
+  // Descarta los hallazgos de la pasada anterior antes de re-derivarlos.
+  this.brokenRules.clear();
+
+  this._guardStrategy();
+  // ...
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Por qué nadie lo vio</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Porque el patrón de uso dominante lo esconde:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>const product = Product.create(name, description, price);   // valida UNA vez</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Se construye el objeto, se valida, y si falla se lanza y se descarta. <strong>Nunca se valida dos veces el mismo objeto.</strong> En ese camino el bug no existe.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Sólo aparece cuando algo revalida: un agregado de vida larga que se modifica y se vuelve a comprobar, un formulario que reintenta contra la misma instancia, un test que llama a <code>validate()</code> dos veces. Y los tests no lo hacían, porque se escribieron imitando el flujo normal.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">El patrón de test que lo caza</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>it('vuelve a ser válido cuando se corrige el problema', () =&gt; {
+  const product = new Product({ name, description, price: Price.create(0), status });
+
+  expect(product.isValid).toBe(false);
+
+  product.changePrice(Price.create(49.99));
+
+  expect(product.isValid).toBe(true);                       // ← el que fallaba
+  expect(product.brokenRules.getBrokenRules()).toHaveLength(0);
+});</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>La primera aserción pasa siempre. Es la <strong>segunda</strong> la que tiene valor, y es la que casi nunca se escribe, porque comprobar que algo <em>deja</em> de estar mal se siente redundante cuando ya comprobaste que estaba mal.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>No lo es. <strong>Un test que sólo verifica el camino de fallo no distingue entre «detecta el error» y «se queda atascado en el error».</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Una regla general</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Si tienes un método que deriva un resultado del estado actual —validación, cálculo de totales, resolución de permisos— hazte una pregunta: <strong>¿qué pasa si lo llamo dos veces?</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Debería dar lo mismo si el estado no cambió, y algo distinto si cambió. Si el segundo resultado depende de que hubo un primero, tienes un acumulador donde querías una función. Busca <code>.clear()</code>, <code>= []</code> o <code>.reset()</code> al principio de esos métodos: cuando falta uno, casi nunca es a propósito.</p>
+<!-- /wp:paragraph -->

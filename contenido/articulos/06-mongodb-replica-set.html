@@ -1,0 +1,83 @@
+<!-- meta: cat=Guías | tags=MongoDB,Event Sourcing,NestJS | resumen=Las transacciones exigen replica set, y no se puede crear una colección dentro de una. Dos requisitos que nadie documenta hasta que te bloquean. -->
+<!-- wp:paragraph -->
+<p>Si vas a hacer event sourcing sobre MongoDB, hay dos requisitos que no aparecen en ningún tutorial y que te van a bloquear en la primera hora. Los dos tienen arreglo trivial; encontrarlos es lo que cuesta.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">1. Las transacciones exigen un replica set</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Un event store escribe el evento y actualiza la versión del agregado. Esas dos cosas tienen que ser atómicas, o pierdes el control de concurrencia optimista. Así que necesitas una transacción.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Y <strong>las transacciones de MongoDB exigen un conjunto de réplicas</strong>. Un <code>mongod</code> suelto falla en el primer commit, con un error que menciona sesiones y no menciona réplicas.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Para desarrollo, un nodo único en modo réplica basta:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>docker run -d --name mongo -p 27017:27017 mongo:7 --replSet rs0
+docker exec mongo mongosh --eval 'rs.initiate()'</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Un solo nodo, pero declarado como réplica. Eso es todo lo que MongoDB necesita para habilitar transacciones.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">2. No se puede crear una colección dentro de una transacción</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Éste es peor, porque sólo ocurre <strong>la primera vez</strong>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>MongoDB crea las colecciones al vuelo en la primera escritura. Pero dentro de una transacción multi-documento, esa creación implícita está prohibida. Así que con la base vacía, tu primer <code>append</code> falla — y en cuanto alguien crea la colección por otra vía, deja de fallar para siempre.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El resultado es un bug que no se reproduce en el equipo de nadie salvo en el de quien acaba de clonar el proyecto. Y en producción aparece exactamente una vez, en el despliegue inicial, cuando menos ganas tienes de depurar.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>La solución es crear las colecciones al arrancar, fuera de cualquier transacción:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>async onApplicationBootstrap(): Promise&lt;void&gt; {
+  const existentes = await this.connection.db.listCollections().toArray();
+  const nombres = new Set(existentes.map((c) =&gt; c.name));
+
+  for (const requerida of ['events', 'snapshots']) {
+    if (!nombres.has(requerida)) {
+      await this.connection.db.createCollection(requerida);
+    }
+  }
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Un tercero, de regalo: <code>commit()</code> no espera</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>El <code>commit()</code> de <code>@nestjs/cqrs</code> es <strong>síncrono y sin espera</strong>: entrega los eventos al bus y vuelve. No devuelve una promesa que puedas esperar.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>En producción casi nunca importa. En un test, importa siempre: escribes el comando, compruebas la proyección, y la proyección todavía no ha corrido. El test falla una de cada cinco veces y culpas a la máquina.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<pre><code>await this.publisher.flush();   // espera a que los proyectores terminen</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Y una advertencia sobre cómo diagnosticar esto: <strong>instrumentar puede esconder la carrera</strong>. Añadir una consulta entre la escritura y la comprobación introduce suficiente latencia para que el proyector llegue a tiempo, y el test pasa cinco de cinco. Quitas la instrumentación y vuelve a fallar. Mide sin tocar el camino que estás midiendo.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<div class="nl-note">
+  <p class="nl-note__title">Para seguir</p>
+  <p>La configuración completa del event store, con snapshots y upcasting, está en <a href="https://docs.nestjslatam.dev/event-sourcing/">la documentación de ddd-es-lib</a>.</p>
+</div>
+<!-- /wp:html -->

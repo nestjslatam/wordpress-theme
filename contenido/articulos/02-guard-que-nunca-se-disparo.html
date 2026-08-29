@@ -1,0 +1,82 @@
+<!-- meta: cat=Ingeniería | tags=TypeScript,Bugs,DDD | resumen=isValid pasó de método a getter. El código viejo seguía compilando, los tests seguían en verde, y la validación llevaba dos versiones sin ejecutarse. -->
+<!-- wp:paragraph -->
+<p>Durante dos versiones, <code>@nestjslatam/ddd-lib</code> tuvo una validación que no validaba nada. Compilaba, los tests pasaban en verde, y la causa cabe en una línea.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">El cambio</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>// 2.x
+public isValid(): boolean { ... }
+
+// 3.x
+public get isValid(): boolean { ... }</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Un cambio razonable. <code>isValid</code> describe un estado, no una acción, y un getter lo dice mejor. Estaba anunciado en el CHANGELOG como cambio incompatible.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">El código que quedó</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<pre><code>if (!name.isValid) {          // ← sobre 2.x, esto evalúa la FUNCIÓN
+  throw new BrokenRulesException(...);
+}</code></pre>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>En 2.x, <code>name.isValid</code> es una referencia a función. Una función es siempre <em>truthy</em>. Así que <code>!name.isValid</code> es <strong>siempre <code>false</code></strong>, y el cuerpo del <code>if</code> no se ejecuta jamás.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>La fábrica devuelve todos los objetos que le pidas, válidos o no. Sin error. Sin aviso. Sin nada que aparezca en un log.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Por qué no lo cogió el compilador</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Porque <code>!fn</code> es TypeScript perfectamente legal. Negar una función da un booleano; el tipo es correcto. El compilador no tiene forma de saber que querías negar el <em>resultado</em> de llamarla.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Con <code>strictNullChecks</code> tampoco salta: no hay nada nulo. Con ESLint tampoco, salvo que tengas activada <code>@typescript-eslint/no-unnecessary-condition</code>, que requiere información de tipos y casi nadie enciende porque es lenta.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">La simetría del error</h2><!-- /wp:heading -->
+
+<!-- wp:html -->
+<table>
+<tr><th>Escribes</th><th>Sobre 2.x (método)</th><th>Sobre 3.x (getter)</th></tr>
+<tr><td><code>if (!obj.isValid)</code></td><td><strong>Nunca se dispara</strong>, en silencio</td><td>Correcto</td></tr>
+<tr><td><code>if (!obj.isValid())</code></td><td>Correcto</td><td><strong><code>TypeError</code></strong> al ejecutar</td></tr>
+</table>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>La migración de 2.x a 3.x rompe ruidosamente: intentas invocar un booleano y revienta. Eso es <em>bueno</em> — un fallo escandaloso es un fallo que se arregla.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>La dirección peligrosa es la otra: código escrito con sintaxis de getter corriendo sobre una versión de método. Ahí no revienta nada. Simplemente deja de validar.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Qué hicimos</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Un <code>validate</code> que lee tus tipos instalados.</strong> <code>npx ddd validate</code> no lleva una tabla de compatibilidad; parsea los <code>.d.ts</code> de tu <code>node_modules</code> y comprueba tu código contra la API que realmente tienes.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Convertimos el README en un test.</strong> El ejemplo de inicio rápido es ahora un fichero <code>.spec.ts</code> que corre en CI. Si deja de compilar contra la versión publicada, el build se pone rojo antes de que nadie lo copie.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading --><h2 class="wp-block-heading">Lo que nos llevamos</h2><!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Un booleano y una función que devuelve booleano son <strong>intercambiables en un contexto de verdad</strong>, y ésa es la trampa. El lenguaje no distingue «el valor» de «la cosa que produce el valor» cuando lo único que haces es preguntar si es cierto.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Cada vez que un cambio de API convierte un método en propiedad —o al revés— estás creando esta trampa para todos tus consumidores. Merece una regla de lint, un <code>validate</code>, o como mínimo un párrafo en mayúsculas en el CHANGELOG.</p>
+<!-- /wp:paragraph -->
