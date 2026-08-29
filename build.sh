@@ -14,7 +14,9 @@ STAGE="$OUT/$SLUG"
 
 VERSION="$(grep -m1 '^Version:' "$ROOT/style.css" | sed 's/Version:[[:space:]]*//' | tr -d '\r')"
 
-rm -rf "$OUT"
+# Sólo lo suyo: `rm -rf dist` se llevaba por delante el XML de contenido que
+# genera contenido/generar-wxr.py, que también vive aquí.
+rm -rf "$STAGE" "$OUT/$SLUG"-*.zip
 mkdir -p "$STAGE"
 
 # Sólo lo que el tema necesita en tiempo de ejecución.
