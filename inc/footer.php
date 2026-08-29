@@ -28,7 +28,7 @@ function nestjslatam_footer( $copyright ) {
 					<span><?php echo esc_html( get_bloginfo( 'name' ) ); ?></span>
 				</a>
 				<p class="nl-footer__tag"><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
-				<p class="nl-footer__made">Hecho en Perú 🇵🇪</p>
+				<p class="nl-footer__made">Hecho en Perú</p>
 			</div>
 
 			<nav class="nl-footer__col" aria-label="Documentación">

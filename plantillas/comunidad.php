@@ -100,37 +100,31 @@ defined( 'ABSPATH' ) || exit;
 
   <div class="nl-repos">
     <a class="nl-repo" href="https://github.com/nestjslatam/ddd">
-      <span class="nl-repo__icon">🧱</span>
       <span class="nl-repo__name">ddd</span>
       <span class="nl-repo__what">La librería principal y su aplicación de ejemplo</span>
       <span class="nl-repo__tag">TypeScript · MIT</span>
     </a>
     <a class="nl-repo" href="https://github.com/nestjslatam/ddd-cli">
-      <span class="nl-repo__icon">🤖</span>
       <span class="nl-repo__name">ddd-cli</span>
       <span class="nl-repo__what">La herramienta de línea de comandos y el servidor MCP</span>
       <span class="nl-repo__tag">TypeScript · MIT</span>
     </a>
     <a class="nl-repo" href="https://github.com/nestjslatam/ddd-valueobjects">
-      <span class="nl-repo__icon">💎</span>
       <span class="nl-repo__name">ddd-valueobjects</span>
       <span class="nl-repo__what">Los doce value objects ya hechos y probados</span>
       <span class="nl-repo__tag">TypeScript · MIT</span>
     </a>
     <a class="nl-repo" href="https://github.com/nestjslatam/ddd-event-sourcing">
-      <span class="nl-repo__icon">📼</span>
       <span class="nl-repo__name">ddd-event-sourcing</span>
       <span class="nl-repo__what">Event sourcing sobre MongoDB</span>
       <span class="nl-repo__tag">TypeScript · MIT</span>
     </a>
     <a class="nl-repo" href="https://github.com/nestjslatam/docs">
-      <span class="nl-repo__icon">📚</span>
       <span class="nl-repo__name">docs</span>
       <span class="nl-repo__what">Esta documentación. Se edita por PR como todo lo demás</span>
       <span class="nl-repo__tag">Markdown · MIT</span>
     </a>
     <a class="nl-repo" href="https://github.com/nestjslatam/wordpress-theme">
-      <span class="nl-repo__icon">🎨</span>
       <span class="nl-repo__name">wordpress-theme</span>
       <span class="nl-repo__what">El diseño de este portal, versionado en git</span>
       <span class="nl-repo__tag">PHP · CSS · MIT</span>

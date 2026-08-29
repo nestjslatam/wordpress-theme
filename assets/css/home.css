@@ -106,6 +106,8 @@
 
 /* Etiquetas de paquete ---------------------------------------------------- */
 
+/* La pastilla con el nombre del paquete es ahora el ancla visual de la
+   tarjeta, en lugar del emoji que había: dice más y no baja el registro. */
 .nl-pill {
   display: inline-block;
   font-family: var(--nl-font-mono);
@@ -504,6 +506,8 @@
   display: grid;
   gap: var(--nl-space-2);
   padding: var(--nl-space-6);
+  /* Sin icono: la identidad la da el nombre en monoespaciada, que además es
+     como se escribe un paquete de npm. Un emoji delante lo abarataba. */
   border: 1px solid var(--nl-border-soft);
   border-radius: var(--nl-radius-lg);
   background: var(--nl-bg-subtle);
@@ -516,7 +520,6 @@
   background: var(--nl-bg-sunken);
   transform: translateY(-2px);
 }
-.nl-repo__icon { font-size: 1.5rem; line-height: 1; }
 .nl-repo__name {
   font-family: var(--nl-font-mono);
   font-size: var(--nl-text-base);

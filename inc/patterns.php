@@ -47,25 +47,21 @@ function nestjslatam_register_patterns() {
 			'content'    => '<!-- wp:html -->
 <div class="nl-cards">
   <article class="nl-card">
-    <div class="nl-card__icon">🧱</div>
     <h3 class="nl-card__title"><a href="https://github.com/nestjslatam/ddd">ddd-lib</a></h3>
     <p class="nl-card__body">Agregados que acumulan sus propias reglas rotas, value objects que se validan solos y seguimiento de estado.</p>
     <a class="nl-card__cta" href="https://docs.nestjslatam.dev/guia/">Leer la guía</a>
   </article>
   <article class="nl-card">
-    <div class="nl-card__icon">🤖</div>
     <h3 class="nl-card__title"><a href="https://github.com/nestjslatam/ddd-cli">ddd-cli</a></h3>
     <p class="nl-card__body">Entiende, genera y audita tu dominio. Corre como servidor MCP sin necesitar clave de API.</p>
     <a class="nl-card__cta" href="https://docs.nestjslatam.dev/cli/">Ver comandos</a>
   </article>
   <article class="nl-card">
-    <div class="nl-card__icon">💎</div>
     <h3 class="nl-card__title"><a href="https://github.com/nestjslatam/ddd-valueobjects">ddd-valueobjects</a></h3>
     <p class="nl-card__body">Doce value objects ya hechos: email, dinero, teléfono, documentos de identidad, fechas.</p>
     <a class="nl-card__cta" href="https://docs.nestjslatam.dev/valueobjects/">Ver el catálogo</a>
   </article>
   <article class="nl-card">
-    <div class="nl-card__icon">📼</div>
     <h3 class="nl-card__title"><a href="https://github.com/nestjslatam/ddd-event-sourcing">ddd-es-lib</a></h3>
     <p class="nl-card__body">Event sourcing sobre MongoDB: event store, snapshots, upcasting, sagas y vistas materializadas.</p>
     <a class="nl-card__cta" href="https://docs.nestjslatam.dev/event-sourcing/">Empezar</a>

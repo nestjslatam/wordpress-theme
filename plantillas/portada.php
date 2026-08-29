@@ -58,7 +58,6 @@ defined( 'ABSPATH' ) || exit;
 
   <div class="nl-cards">
     <article class="nl-card">
-      <div class="nl-card__icon">🧱</div>
       <span class="nl-pill">ddd-lib</span>
       <h3 class="nl-card__title"><a href="https://docs.nestjslatam.dev/guia/">Domain-Driven Design</a></h3>
       <p class="nl-card__body">Agregados que acumulan <strong>todas</strong> sus reglas rotas en vez de lanzar en la primera, y value objects que se validan solos.</p>
@@ -66,7 +65,6 @@ defined( 'ABSPATH' ) || exit;
     </article>
 
     <article class="nl-card">
-      <div class="nl-card__icon">🤖</div>
       <span class="nl-pill">ddd-cli</span>
       <h3 class="nl-card__title"><a href="https://docs.nestjslatam.dev/cli/">Audita tu dominio</a></h3>
       <p class="nl-card__body">Lee los tipos de la versión que tú tienes instalada. Y corre como servidor MCP para Claude Code o Cursor, sin clave de API.</p>
@@ -74,7 +72,6 @@ defined( 'ABSPATH' ) || exit;
     </article>
 
     <article class="nl-card">
-      <div class="nl-card__icon">💎</div>
       <span class="nl-pill">ddd-valueobjects</span>
       <h3 class="nl-card__title"><a href="https://docs.nestjslatam.dev/valueobjects/">Doce ya hechos</a></h3>
       <p class="nl-card__body">Email, dinero, teléfono, DNI, RUC, coordenadas. El <code>Money</code> se niega a sumar soles con dólares.</p>
@@ -82,7 +79,6 @@ defined( 'ABSPATH' ) || exit;
     </article>
 
     <article class="nl-card">
-      <div class="nl-card__icon">📼</div>
       <span class="nl-pill">ddd-es-lib</span>
       <h3 class="nl-card__title"><a href="https://docs.nestjslatam.dev/event-sourcing/">Event sourcing</a></h3>
       <p class="nl-card__body">Sobre MongoDB: event store, snapshots, upcasting, proyecciones y sagas.</p>

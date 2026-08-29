@@ -63,25 +63,21 @@ defined( 'ABSPATH' ) || exit;
 
   <div class="nl-cards">
     <article class="nl-card">
-      <div class="nl-card__icon">🧱</div>
       <h3 class="nl-card__title"><a href="https://docs.nestjslatam.dev/guia/agregados">El dominio</a></h3>
       <p class="nl-card__body">Agregados, value objects, reglas rotas y eventos de dominio.</p>
       <a class="nl-card__cta" href="https://docs.nestjslatam.dev/guia/agregados">Ver</a>
     </article>
     <article class="nl-card">
-      <div class="nl-card__icon">⚙️</div>
       <h3 class="nl-card__title"><a href="https://docs.nestjslatam.dev/guia/cqrs">La aplicación</a></h3>
       <p class="nl-card__body">Comandos, consultas y cómo mapear los errores del dominio a 400, 422 y 409.</p>
       <a class="nl-card__cta" href="https://docs.nestjslatam.dev/guia/cqrs">Ver</a>
     </article>
     <article class="nl-card">
-      <div class="nl-card__icon">🤖</div>
       <h3 class="nl-card__title"><a href="https://docs.nestjslatam.dev/cli/">El CLI</a></h3>
       <p class="nl-card__body">Comandos, auditoría del idioma y el servidor MCP con sus siete herramientas.</p>
       <a class="nl-card__cta" href="https://docs.nestjslatam.dev/cli/">Ver</a>
     </article>
     <article class="nl-card">
-      <div class="nl-card__icon">📖</div>
       <h3 class="nl-card__title"><a href="https://docs.nestjslatam.dev/guia/api">Referencia</a></h3>
       <p class="nl-card__body">Las piezas públicas, y qué cambió entre versiones.</p>
       <a class="nl-card__cta" href="https://docs.nestjslatam.dev/guia/api">Ver</a>

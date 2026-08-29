@@ -384,7 +384,6 @@
   transform: translateY(-2px);
 }
 
-.nl-card__icon { font-size: 1.6rem; line-height: 1; margin-bottom: var(--nl-space-4); }
 
 .nl-card__title {
   font-size: var(--nl-text-lg);

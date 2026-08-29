@@ -61,3 +61,23 @@ jobs:
               print('  plantillas que faltan:', ', '.join(sorted(falta))); sys.exit(1)
           print(f'  ✓ las {len(nombres)} plantillas existen')
           PY
+
+      - name: Sin emoji en la interfaz
+        run: |
+          # El diseño es minimalista: un emoji en una tarjeta baja el registro
+          # de todo lo que lo rodea. Se cuelan con facilidad al pegar contenido.
+          python3 - <<'PY'
+          import pathlib, re, sys
+          EMOJI = re.compile('[\U0001F300-\U0001FAFF☀-➿\U0001F1E6-\U0001F1FF]')
+          malos = []
+          for d in ('inc', 'plantillas'):
+              for f in pathlib.Path(d).rglob('*.php'):
+                  for n, linea in enumerate(f.read_text().splitlines(), 1):
+                      if EMOJI.search(linea):
+                          malos.append(f'{f}:{n}')
+          if malos:
+              print('  emoji encontrados en:')
+              for m in malos: print(f'    {m}')
+              sys.exit(1)
+          print('  ✓ sin emoji')
+          PY

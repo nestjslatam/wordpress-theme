@@ -47,19 +47,16 @@ defined( 'ABSPATH' ) || exit;
   </div>
   <div class="nl-cards">
     <article class="nl-card">
-      <div class="nl-card__icon">🤖</div>
       <h3 class="nl-card__title"><a href="/como-conectar-el-cli-a-tu-agente-por-mcp/">Conectar el CLI a tu agente por MCP</a></h3>
       <p class="nl-card__body">Claude Code o Cursor con siete herramientas deterministas, en un comando y sin clave de API.</p>
       <a class="nl-card__cta" href="/como-conectar-el-cli-a-tu-agente-por-mcp/">Leer</a>
     </article>
     <article class="nl-card">
-      <div class="nl-card__icon">📘</div>
       <h3 class="nl-card__title"><a href="https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md">La guía completa del CLI</a></h3>
       <p class="nl-card__body">Cada comando y cada opción, construyendo un dominio de transporte marítimo desde cero hasta diez ficheros que compilan.</p>
       <a class="nl-card__cta" href="https://github.com/nestjslatam/ddd-cli/blob/main/docs/GUIDE.md">Abrir</a>
     </article>
     <article class="nl-card">
-      <div class="nl-card__icon">📼</div>
       <h3 class="nl-card__title"><a href="/mongodb-para-event-sourcing-los-dos-requisitos-que-nadie-te-cuenta/">MongoDB para event sourcing</a></h3>
       <p class="nl-card__body">Los dos requisitos que no aparecen en ningún tutorial y te bloquean en la primera hora.</p>
       <a class="nl-card__cta" href="/mongodb-para-event-sourcing-los-dos-requisitos-que-nadie-te-cuenta/">Leer</a>

@@ -17,19 +17,16 @@ defined( 'ABSPATH' ) || exit;
 
 <div class="nl-cards" style="margin-bottom:0">
   <article class="nl-card">
-    <div class="nl-card__icon">🐛</div>
     <h3 class="nl-card__title">¿Es un fallo?</h3>
     <p class="nl-card__body">Un issue en GitHub llega antes y queda público para quien tenga el mismo problema. Adjunta la versión exacta y cómo reproducirlo.</p>
     <a class="nl-card__cta" href="https://github.com/nestjslatam/ddd/issues/new">Abrir un issue</a>
   </article>
   <article class="nl-card">
-    <div class="nl-card__icon">🔒</div>
     <h3 class="nl-card__title">¿Es una vulnerabilidad?</h3>
     <p class="nl-card__body">No la abras como issue público. Cada repositorio tiene un canal privado para reportarlas.</p>
     <a class="nl-card__cta" href="https://github.com/nestjslatam/ddd/security/policy">Política de seguridad</a>
   </article>
   <article class="nl-card">
-    <div class="nl-card__icon">✍️</div>
     <h3 class="nl-card__title">¿Quieres escribir?</h3>
     <p class="nl-card__body">Cuéntanos la idea por aquí abajo. Lo publicamos con tu firma y tu enlace.</p>
     <a class="nl-card__cta" href="#formulario">Al formulario</a>
