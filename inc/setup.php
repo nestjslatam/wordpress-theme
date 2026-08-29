@@ -152,12 +152,17 @@ function nestjslatam_excerpt_sin_codigo( $texto, $post ) {
 	}
 
 	$contenido = $post->post_content;
+	// Los bloques sí se van enteros: un <pre> dentro de un extracto es ruido
+	// aunque se le quiten las etiquetas.
 	$contenido = preg_replace(
 		'#<(pre|table|blockquote)\b[^>]*>.*?</\1>#is',
 		' ',
 		$contenido
 	);
-	$contenido = preg_replace( '#<code\b[^>]*>.*?</code>#is', ' ', $contenido );
+	// El <code> EN LÍNEA conserva su texto: son palabras dentro de la frase,
+	// y borrarlas deja «La 4.0.0 de ddd-lib es la primera» en «La de es la
+	// primera». Sólo se van las etiquetas, no lo que llevan dentro.
+	$contenido = preg_replace( '#</?code\b[^>]*>#i', '', $contenido );
 	$contenido = strip_shortcodes( $contenido );
 	$contenido = excerpt_remove_blocks( $contenido );
 

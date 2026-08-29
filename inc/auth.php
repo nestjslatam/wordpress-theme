@@ -173,21 +173,15 @@ add_shortcode( 'nl_acceso', 'nestjslatam_acceso_shortcode' );
  * que es el que ya existe. Lo que cambia es el diseño y desde dónde se llega.
  */
 /**
- * Acciones de la barra: documentación y GitHub.
+ * GitHub en la barra de navegación.
  *
- * Van antes que la cuenta y en el mismo hook, así que comparten fila y el
- * lado derecho de la navegación deja de ser espacio muerto. Son los dos
- * destinos que más se buscan en un sitio de comunidad técnica.
+ * Antes había además enlaces a Guías y Documentación, pero desde que el menú
+ * se completa solo esos destinos ya están a la izquierda: repetirlos a la
+ * derecha era ruido, no atajo.
  */
 function nestjslatam_header_actions() {
 	?>
 	<span class="nl-actions">
-		<a class="nl-actions__link" href="<?php echo esc_url( home_url( '/guias/' ) ); ?>">
-			<?php esc_html_e( 'Guías', 'nestjslatam' ); ?>
-		</a>
-		<a class="nl-actions__docs" href="https://docs.nestjslatam.dev">
-			<?php esc_html_e( 'Documentación', 'nestjslatam' ); ?>
-		</a>
 		<a class="nl-actions__gh" href="https://github.com/nestjslatam"
 		   aria-label="<?php esc_attr_e( 'NestJS Latam en GitHub', 'nestjslatam' ); ?>">
 			<svg width="19" height="19" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
